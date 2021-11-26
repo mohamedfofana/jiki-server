@@ -1,0 +1,10 @@
+mysqld --console --defaults-file="D:\\mfofana\\configuration\my.ini" 
+----------------
+mdp mysql : *87,;MSQL 
+kodakro/*87,;KDKR
+----------------------
+spring.datasource.username=jiki
+spring.datasource.password=jiki,;00
+---------------------------------
+Mysql port : 3306
+Service MYSQL80
