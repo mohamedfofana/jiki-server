@@ -54,6 +54,11 @@ public class SprintController {
 			return sprint.get();
 		else
 			return null;
+
+	}
+	@GetMapping("/project/{id}")
+	public List<Sprint> getSprintsByProjectId(@PathVariable("id") Long id){
+		return sprintRepository.findByProjectId(id);
 	}
 
 	@DeleteMapping("/{id}")

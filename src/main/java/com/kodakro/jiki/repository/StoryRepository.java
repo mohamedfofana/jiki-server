@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -30,9 +31,13 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 		final String whereSql= " AND ST.ID =? ";
 		Object[] param = {id};
 		int[] types = {Types.INTEGER};
-		Story story = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
-				new StoryRowMapper());
-
+		Story story = null;
+		try {
+			story = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
+					new StoryRowMapper());
+		}catch (EmptyResultDataAccessException e) {
+			// log no Story found
+		}
 		return Optional.ofNullable(story);
 	}
 	
@@ -55,6 +60,16 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 		
 		return stories;
 	}
+
+	public List<Story> findStoriesOnBacklogsByProjectId(Long id) {
+		final String whereSql= " AND ST.PROJECT_ID =? AND BA_ASS.ID IS NOT NULL";
+		Object[] param = {id};
+		int[] types = {Types.INTEGER};
+		List<Story> stories = jdbcTemplate.query(getJoinSelectOnBacklogsProject(whereSql), param, types,
+				new StoryRowMapper());
+		return stories;
+	}
+	
 	public List<Story> findByProjectIdAndSprintId(Long projectId, Long sprintId) {
 		final String whereProject= " AND ST.PROJECT_ID =?";
 		Object[] param = {projectId, sprintId};
@@ -80,7 +95,7 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 		final String whereSql= " AND ST.SPRINT_ID =? ";
 		Object[] param = {id};
 		int[] types = {Types.INTEGER};
-		List<Story> stories = jdbcTemplate.query(getJoinSelect(whereSql), param, types,
+		List<Story> stories = jdbcTemplate.query(getJoinSelectSprint(whereSql), param, types,
 				new StoryRowMapper());
 		
 		return stories;

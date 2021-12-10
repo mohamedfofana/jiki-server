@@ -49,7 +49,10 @@ public class StoryController {
 	public List<Story> getStoryByProjectId(@PathVariable("id") Long projectId){
 		return storyService.getStoriesByProjectId(projectId);
 	}
-	
+	@GetMapping("/backlogs/project/{id}")
+	public List<Story> getStoriesOnBacklogsByProjectId(@PathVariable("id") Long projectId){
+		return storyService.getStoriesOnBacklogsByProjectId(projectId);
+	}
 	@GetMapping("/project/{projectId}/sprint/{sprintId}")
 	public List<Story> getStoryByProjectIdAndSprintId(@PathVariable("projectId") Long projectId, @PathVariable("sprintId") Long sprintId){
 		return storyService.getStoryByProjectIdAndSprintId(projectId, sprintId);

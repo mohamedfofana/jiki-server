@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -30,9 +31,13 @@ public class ProjectRepository extends AbstractProjectRequest implements IGeneri
 		final String whereSql= " AND PR.ID =? ";
 		Object[] param = {id};
 		int[] types = {Types.INTEGER};
-		Project project = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
-				new ProjectRowMapper());
-
+		Project project = null;
+		try {		
+			project = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
+					new ProjectRowMapper());
+		}catch(EmptyResultDataAccessException e) {
+			// Log no project found
+		}
 		return Optional.ofNullable(project);
 	}
 

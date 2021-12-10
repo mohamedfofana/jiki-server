@@ -31,9 +31,13 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 		final String whereSql= " AND SP.ID =?";
 		Object[] param = {id};
 		int[] types = {Types.INTEGER};
-		Sprint sprint = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
+		Sprint sprint = null;
+		try {
+			sprint = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
 				new SprintRowMapper());
-
+		}catch(EmptyResultDataAccessException e) {
+			// log No sprint found
+		}
 		return Optional.ofNullable(sprint);
 	}
 
@@ -46,7 +50,29 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 			sprint = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
 					new SprintRowMapper());			
 		}catch(EmptyResultDataAccessException e) {
-			Optional.ofNullable(null);
+			// log No sprint found
+		}
+		return Optional.ofNullable(sprint);
+	}
+	public List<Sprint> findByProjectId(Long id) {
+		final String whereSql= " AND PR.ID =?";
+		Object[] param = {id};
+		int[] types = {Types.INTEGER};
+		List<Sprint> sprint = null;
+		sprint = jdbcTemplate.query(getJoinSelect(whereSql), param, types,
+					new SprintRowMapper());			
+		return sprint;
+	}
+	public Optional<Sprint> findCurrentByTeamId(Long id) {
+		final String whereSql= " AND PR.ID =? AND SP.STATUS='RUNNING'";
+		Object[] param = {id};
+		int[] types = {Types.INTEGER};
+		Sprint sprint = null;
+		try {
+			sprint = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
+					new SprintRowMapper());			
+		}catch(EmptyResultDataAccessException e) {
+			// log No sprint found
 		}
 		return Optional.ofNullable(sprint);
 	}

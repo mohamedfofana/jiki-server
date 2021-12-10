@@ -48,6 +48,11 @@ public class StoryService {
 		List<Story> stories= storyRepository.findByProjectId(id);		
 		return stories;
 	}
+
+	public List<Story> getStoriesOnBacklogsByProjectId(Long id){
+		List<Story> stories= storyRepository.findStoriesOnBacklogsByProjectId(id);		
+		return stories;
+	}
 	
 	public List<Story> getStoryByProjectIdAndSprintId(Long projectId, Long sprintId){
 		List<Story> stories= storyRepository.findByProjectIdAndSprintId(projectId, sprintId);		

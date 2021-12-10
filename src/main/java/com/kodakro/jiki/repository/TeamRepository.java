@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import com.kodakro.jiki.model.Backlog;
 import com.kodakro.jiki.model.Team;
+import com.kodakro.jiki.repository.mapper.BacklogRowMapper;
 import com.kodakro.jiki.repository.mapper.TeamRowMapper;
 import com.kodakro.jiki.repository.request.AbstractTeamRequest;
 
@@ -29,9 +32,13 @@ public class TeamRepository extends AbstractTeamRequest implements IGenericRepos
 	public Optional<Team> findById(Long id) {
 		Object[] param = {id};
 		int[] types = {Types.INTEGER};
-		Team team = jdbcTemplate.queryForObject(getJoinSelect(null), param, types,
-				new TeamRowMapper());
-
+		Team team = null;
+		try{
+			team = jdbcTemplate.queryForObject(getJoinSelect(null), param, types,
+					new TeamRowMapper());
+		}catch (EmptyResultDataAccessException e) {
+			// Log no Backlog found
+		}
 		return Optional.ofNullable(team);
 	}
 

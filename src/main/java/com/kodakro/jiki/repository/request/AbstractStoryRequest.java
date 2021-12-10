@@ -26,7 +26,7 @@ public abstract class AbstractStoryRequest {
 			+ "ST.END_DATE AS END_DATE_ST ,"
 			+ "ST.ESTIMATED_END_DATE AS ESTIMATED_END_DATE_ST \n";	
 	protected final String FROM_SQL="FROM "+TABLE;
-	protected static final String JOIN_SPRINT =" LEFT JOIN T_SPRINT SP_ASS ON SP_ASS.ID = ST.SPRINT_ID ";
+	protected static final String JOIN_SPRINT =" INNER JOIN T_SPRINT SP_ASS ON SP_ASS.ID = ST.SPRINT_ID ";
 	protected static final String LEFT_JOIN_SPRINT =" LEFT JOIN T_SPRINT SP_ASS ON SP_ASS.ID = ST.SPRINT_ID ";
 	protected static final String JOIN_PROJECT =" INNER JOIN T_PROJECT PR_ASS ON PR_ASS.ID = ST.PROJECT_ID ";
 	protected static final String JOIN_REPORTER =" INNER JOIN T_USER US_RE ON US_RE.ID = ST.REPORTER_ID ";
@@ -51,11 +51,11 @@ public abstract class AbstractStoryRequest {
 		sb.append(", ");
 		sb.append(AbstractUserRequest.ASSIGNED_COLUMNS_SQL);
 		sb.append(FROM_SQL);		
-		sb.append(JOIN_PROJECT);
 		sb.append(JOIN_SPRINT);
 		if (whereSql != null) {
 			sb.append(whereSql);
 		}
+		sb.append(JOIN_PROJECT);
 		sb.append(JOIN_BACKLOG);
 		sb.append(JOIN_REPORTER);
 		sb.append(LEFT_JOIN_ASSIGNED_TEAM);
@@ -78,12 +78,12 @@ public abstract class AbstractStoryRequest {
 		sb.append(", ");
 		sb.append(AbstractUserRequest.ASSIGNED_COLUMNS_SQL);
 		sb.append(FROM_SQL);		
-		sb.append(JOIN_PROJECT);
-		sb.append(JOIN_SPRINT);
+		sb.append(JOIN_BACKLOG);
 		if (whereSql != null) {
 			sb.append(whereSql);
 		}
-		sb.append(JOIN_BACKLOG);
+		sb.append(JOIN_SPRINT);
+		sb.append(JOIN_PROJECT);
 		sb.append(JOIN_REPORTER);
 		sb.append(LEFT_JOIN_ASSIGNED_TEAM);
 		sb.append(LEFT_JOIN_ASSIGNED_USER);
@@ -106,13 +106,40 @@ public abstract class AbstractStoryRequest {
 		sb.append(", ");
 		sb.append(AbstractUserRequest.ASSIGNED_COLUMNS_SQL);
 		sb.append(FROM_SQL);		
-		sb.append(JOIN_PROJECT);
 		sb.append(JOIN_SPRINT);
 		if (whereSql != null) {
 			sb.append(whereSql);
 		}
+		sb.append(JOIN_PROJECT);
 		sb.append(JOIN_REPORTER);
+		sb.append(LEFT_BACKLOG);
+		sb.append(LEFT_JOIN_ASSIGNED_TEAM);
+		sb.append(LEFT_JOIN_ASSIGNED_USER);
+		return sb.toString();
+	}
+	protected String getJoinSelectOnBacklogsProject(String whereSql) {
+		StringBuilder sb = new StringBuilder(SELECT_SQL);		
+		sb.append(COLUMNS_SQL);
+		sb.append(", ");
+		sb.append(AbstractSprintRequest.ASSIGNED_COLUMNS_SQL);
+		sb.append(", ");
+		sb.append(AbstractProjectRequest.ASSIGNED_COLUMNS_SQL);
+		sb.append(", ");
+		sb.append(AbstractBacklogRequest.ASSIGNED_COLUMNS_SQL);
+		sb.append(", ");
+		sb.append(AbstractUserRequest.REPORTER_COLUMNS_SQL);
+		sb.append(", ");
+		sb.append(AbstractTeamRequest.ASSIGNED_COLUMNS_SQL);
+		sb.append(", ");
+		sb.append(AbstractUserRequest.ASSIGNED_COLUMNS_SQL);
+		sb.append(FROM_SQL);		
 		sb.append(JOIN_BACKLOG);
+		if (whereSql != null) {
+			sb.append(whereSql);
+		}
+		sb.append(JOIN_SPRINT);
+		sb.append(JOIN_PROJECT);
+		sb.append(JOIN_REPORTER);
 		sb.append(LEFT_JOIN_ASSIGNED_TEAM);
 		sb.append(LEFT_JOIN_ASSIGNED_USER);
 		return sb.toString();
@@ -133,19 +160,21 @@ public abstract class AbstractStoryRequest {
 		sb.append(", ");
 		sb.append(AbstractUserRequest.ASSIGNED_COLUMNS_SQL);
 		sb.append(FROM_SQL);		
-		sb.append(JOIN_SPRINT);
+		sb.append(JOIN_PROJECT);
 		if (whereSprint != null) {
 			sb.append(whereSprint);
 		}
-		sb.append(JOIN_PROJECT);
+		sb.append(JOIN_SPRINT);
 		if (whereProject != null) {
 			sb.append(whereProject);
 		}
-		sb.append(JOIN_BACKLOG);
 		sb.append(JOIN_REPORTER);
+		sb.append(JOIN_BACKLOG);
 		sb.append(LEFT_JOIN_ASSIGNED_TEAM);
 		sb.append(LEFT_JOIN_ASSIGNED_USER);
 		return sb.toString();
 	}
+	
+	
 	
 }
