@@ -81,4 +81,10 @@ public class ProjectRepository extends AbstractProjectRequest implements IGeneri
 		return project;
 	}
 
+	@Override
+	public Optional<Project> exists(Long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

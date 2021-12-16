@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
+import com.kodakro.jiki.model.Backlog;
 import com.kodakro.jiki.model.Project;
 import com.kodakro.jiki.model.Team;
 import com.kodakro.jiki.model.User;
@@ -29,6 +30,10 @@ public class UserRowMapper extends AbstractRowMapper implements RowMapper<User>{
 		if (isIdColumn(rs, "ID_PR_ASS")) {
 			Project project = new ProjectRowMapper().mapRowAssigned(rs, rowNum);
 			user.setProject(project);
+			if (isIdColumn(rs,"ID_BA_ASS")) {
+				Backlog backlog = new BacklogRowMapper().mapRowAssigned(rs, rowNum);
+				project.setBacklog(backlog);
+			}
 		}
 		return user;
 	}

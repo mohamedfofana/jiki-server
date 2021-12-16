@@ -17,7 +17,7 @@ import com.kodakro.jiki.repository.mapper.StoryRowMapper;
 import com.kodakro.jiki.repository.request.AbstractStoryRequest;
 
 @Repository
-public class StoryRepository extends AbstractStoryRequest  implements IGenericRepository<Story> {
+public class StoryRepository extends AbstractStoryRequest  implements IGenericRepository<Story>, IGenericStoryRepository<Story> {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 
@@ -26,6 +26,21 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 		return jdbcTemplate.query(getJoinSelect(null), new StoryRowMapper());
 	}
 
+	@Override
+	public Optional<Story> exists(Long id) {
+		final String whereSql= " WHERE ST.ID =? ";
+		Object[] param = {id};
+		int[] types = {Types.INTEGER};
+		Story story = null;
+		try {
+			story = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
+					new StoryRowMapper());
+		}catch (EmptyResultDataAccessException e) {
+			// log no Story found
+		}
+		return Optional.ofNullable(story);
+	}
+	
 	@Override
 	public Optional<Story> findById(Long id) {
 		final String whereSql= " AND ST.ID =? ";
@@ -41,28 +56,9 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 		return Optional.ofNullable(story);
 	}
 	
-	public List<Story> findByReporterId(Long id) {
-		final String whereSql= " AND ST.REPORTER_ID =? ";
-		Object[] param = {id};
-		int[] types = {Types.INTEGER};
-		List<Story> stories = jdbcTemplate.query(getJoinSelect(whereSql), param, types,
-				new StoryRowMapper());
-
-		return stories;
-	}
-	
-	public List<Story> findByProjectId(Long id) {
-		final String whereSql= " AND ST.PROJECT_ID =? ";
-		Object[] param = {id};
-		int[] types = {Types.INTEGER};
-		List<Story> stories = jdbcTemplate.query(getJoinSelect(whereSql), param, types,
-				new StoryRowMapper());
-		
-		return stories;
-	}
-
+	@Override
 	public List<Story> findStoriesOnBacklogsByProjectId(Long id) {
-		final String whereSql= " AND ST.PROJECT_ID =? AND BA_ASS.ID IS NOT NULL";
+		final String whereSql= " AND ST.SPRINT_ID IS NULL AND ST.PROJECT_ID =? AND BA_ASS.ID IS NOT NULL";
 		Object[] param = {id};
 		int[] types = {Types.INTEGER};
 		List<Story> stories = jdbcTemplate.query(getJoinSelectOnBacklogsProject(whereSql), param, types,
@@ -70,6 +66,7 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 		return stories;
 	}
 	
+	@Override
 	public List<Story> findByProjectIdAndSprintId(Long projectId, Long sprintId) {
 		final String whereProject= " AND ST.PROJECT_ID =?";
 		Object[] param = {projectId, sprintId};
@@ -81,16 +78,7 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 		return stories;
 	}
 	
-	public List<Story> findByProjectIdAndCurrentSprint(Long id) {
-		final String whereSql= " AND ST.PROJECT_ID =? AND SP_ASS.STATUS='RUNNING'";
-		Object[] param = {id};
-		int[] types = {Types.INTEGER};
-		List<Story> stories = jdbcTemplate.query(getJoinSelect(whereSql), param, types,
-				new StoryRowMapper());
-		
-		return stories;
-	}
-
+	@Override
 	public List<Story> findBySprintId(Long id) {
 		final String whereSql= " AND ST.SPRINT_ID =? ";
 		Object[] param = {id};
@@ -129,15 +117,18 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 		jdbcTemplate.update(sql, param);
 	}
 
+	@Override
 	public void updateSprintAndBacklog(Story story) {
-		final String sql = "UPDATE "+TABLE+" SET BACKLOG_ID=?, SPRINT_ID=? "
+		final String sql = "UPDATE "+TABLE+" SET PROJECT_ID=?, BACKLOG_ID=?, SPRINT_ID=? "
 				+ " WHERE ID=?";
+		Long projectId = story.getProject()!=null? story.getProject().getId():null;
 		Long backlogId = story.getBacklog()!=null? story.getBacklog().getId():null;
 		Long sprintId = story.getSprint()!=null? story.getSprint().getId():null;
-		Object[] param = { backlogId, sprintId, story.getId()};
-		int[] types   = {   backlogId==null?Types.NULL:Types.BIGINT, 
-							sprintId==null?Types.NULL:Types.BIGINT, 
-									Types.BIGINT};
+		Object[] param = { projectId, backlogId, sprintId, story.getId()};
+		int[] types   = {  projectId==null?Types.NULL:Types.BIGINT, 
+						   backlogId==null?Types.NULL:Types.BIGINT, 
+						   sprintId==null?Types.NULL:Types.BIGINT, 
+						   Types.BIGINT};
 		jdbcTemplate.update(sql, param, types);
 	}
 	

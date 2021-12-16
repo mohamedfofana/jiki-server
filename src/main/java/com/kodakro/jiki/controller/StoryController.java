@@ -41,14 +41,6 @@ public class StoryController {
 		return storyService.getStoryById(id);
 	}
 
-	@GetMapping("/user/{id}")
-	public List<Story> getStoryByReporterId(@PathVariable("id") Long userId){
-		return storyService.getStoriesByReporterId(userId);
-	}
-	@GetMapping("/project/{id}")
-	public List<Story> getStoryByProjectId(@PathVariable("id") Long projectId){
-		return storyService.getStoriesByProjectId(projectId);
-	}
 	@GetMapping("/backlogs/project/{id}")
 	public List<Story> getStoriesOnBacklogsByProjectId(@PathVariable("id") Long projectId){
 		return storyService.getStoriesOnBacklogsByProjectId(projectId);
@@ -56,11 +48,6 @@ public class StoryController {
 	@GetMapping("/project/{projectId}/sprint/{sprintId}")
 	public List<Story> getStoryByProjectIdAndSprintId(@PathVariable("projectId") Long projectId, @PathVariable("sprintId") Long sprintId){
 		return storyService.getStoryByProjectIdAndSprintId(projectId, sprintId);
-	}
-	
-	@GetMapping("/current/sprint/project/{id}")
-	public List<Story> getByProjectIdAndCurrentSprint(@PathVariable("id") Long projectId){
-		return storyService.getByProjectIdAndCurrentSprint(projectId);
 	}
 	
 	@GetMapping("/sprint/{id}")

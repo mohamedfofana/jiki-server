@@ -31,6 +31,8 @@ public abstract class AbstractUserRequest {
 	protected final String FROM_SQL="FROM "+TABLE;
 	protected static final String JOIN_TEAM = " INNER JOIN T_TEAM TE ON TE.ID=US.TEAM_ID";
 	protected static final String JOIN_PROJECT = " INNER JOIN T_PROJECT PR_ASS ON PR_ASS.ID=US.PROJECT_ID";
+	protected static final String JOIN_PROJECT_BACKLOG =" LEFT JOIN T_BACKLOG BA_ASS ON BA_ASS.ID = PR_ASS.BACKLOG_ID ";
+	
 	
 	protected String getJoinSelect(String whereSql) {
 		StringBuilder sb = new StringBuilder(SELECT_SQL);		
@@ -39,9 +41,12 @@ public abstract class AbstractUserRequest {
 		sb.append(AbstractTeamRequest.COLUMNS_SQL);
 		sb.append(", ");
 		sb.append(AbstractProjectRequest.ASSIGNED_COLUMNS_SQL);
+		sb.append(", ");
+		sb.append(AbstractBacklogRequest.ASSIGNED_COLUMNS_SQL);
 		sb.append(FROM_SQL);		
 		sb.append(JOIN_TEAM);
 		sb.append(JOIN_PROJECT);
+		sb.append(JOIN_PROJECT_BACKLOG);
 		if (whereSql != null) {
 			sb.append(whereSql);
 		}

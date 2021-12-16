@@ -92,4 +92,10 @@ public class UserRepository extends AbstractUserRequest implements IGenericRepos
 		return user;
 	}
 
+	@Override
+	public Optional<User> exists(Long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

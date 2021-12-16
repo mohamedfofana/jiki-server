@@ -78,4 +78,10 @@ public class BacklogRepository extends AbstractBacklogRequest implements IGeneri
 		t.setId((long) keyHolder.getKey());
 		return t;
 	}
+
+	@Override
+	public Optional<Backlog> exists(Long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

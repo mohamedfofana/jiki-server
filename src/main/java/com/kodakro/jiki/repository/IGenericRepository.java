@@ -4,13 +4,40 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IGenericRepository<T> {
+
+	/*
+	 * Fetch all records from the database
+	 */
 	List<T> findAll();
 
+	/*
+	 * find if a record exists 
+	 * @param id
+	 * 
+	 * Return basic record data without joined records
+	 */
+	Optional<T> exists(Long id);
+
+	/*
+	 * 
+	 * Return complete record
+	 */
 	Optional<T> findById(Long id);
 
+	/*
+	 * 
+	 * Remove the record from the database
+	 */
 	void deleteById(Long id);
 
+	/*
+	 * Update all fields in the record
+	 */
 	void update(T t);
 
+	/*
+	 * 
+	 * Create a new record
+	 */
 	T create(T t);
 }

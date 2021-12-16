@@ -8,9 +8,11 @@ import org.springframework.stereotype.Service;
 
 import com.kodakro.jiki.exception.ResourceNotFoundException;
 import com.kodakro.jiki.model.Backlog;
+import com.kodakro.jiki.model.Project;
 import com.kodakro.jiki.model.Sprint;
 import com.kodakro.jiki.model.Story;
 import com.kodakro.jiki.repository.BacklogRepository;
+import com.kodakro.jiki.repository.ProjectRepository;
 import com.kodakro.jiki.repository.SprintRepository;
 import com.kodakro.jiki.repository.StoryRepository;
 
@@ -22,6 +24,8 @@ public class StoryService {
 	SprintRepository sprintRepository;
 	@Autowired
 	BacklogRepository backlogRepository;
+	@Autowired
+	ProjectRepository projectRepository;
 
 	public List<Story> getStories(){
 		return storyRepository.findAll();
@@ -39,15 +43,15 @@ public class StoryService {
 			return null;
 	}
 
-	public List<Story> getStoriesByReporterId(Long id){
-		List<Story> stories= storyRepository.findByReporterId(id);		
-		return stories;
-	}
+//	public List<Story> getStoriesByReporterId(Long id){
+//		List<Story> stories= storyRepository.findByReporterId(id);		
+//		return stories;
+//	}
 	
-	public List<Story> getStoriesByProjectId(Long id){
-		List<Story> stories= storyRepository.findByProjectId(id);		
-		return stories;
-	}
+//	public List<Story> getStoriesByProjectId(Long id){
+//		List<Story> stories= storyRepository.findByProjectId(id);		
+//		return stories;
+//	}
 
 	public List<Story> getStoriesOnBacklogsByProjectId(Long id){
 		List<Story> stories= storyRepository.findStoriesOnBacklogsByProjectId(id);		
@@ -59,10 +63,10 @@ public class StoryService {
 		return stories;
 	}
 	
-	public List<Story> getByProjectIdAndCurrentSprint(Long id){
-		List<Story> stories= storyRepository.findByProjectIdAndCurrentSprint(id);		
-		return stories;
-	}
+//	public List<Story> getByProjectIdAndCurrentSprint(Long id){
+//		List<Story> stories= storyRepository.findByProjectIdAndCurrentSprint(id);		
+//		return stories;
+//	}
 	
 	public List<Story> getStoriesBySprintId(Long id){
 		List<Story> stories= storyRepository.findBySprintId(id);		
@@ -140,7 +144,7 @@ public class StoryService {
 	}
 	
 	public void updateSprintAndBacklog(Story story){
-		Story dbStory =  storyRepository.findById(story.getId()).orElseThrow(() -> new ResourceNotFoundException("Story", "id", story.getId()));
+		Story dbStory =  storyRepository.exists(story.getId()).orElseThrow(() -> new ResourceNotFoundException("Story", "id", story.getId()));
 		if (dbStory!=null) {
 			if( story.getSprint()!= null) {
 				Optional<Sprint> s = sprintRepository.findById(story.getSprint().getId());	
@@ -149,6 +153,14 @@ public class StoryService {
 				}
 			}else {
 				dbStory.setSprint(null);
+			}
+			if( story.getProject() != null) {
+				Optional<Project> p = projectRepository.findById(story.getProject().getId());
+				if(p.isPresent()) {
+					dbStory.setProject(p.get());
+				}
+			}else {
+				dbStory.setBacklog(null);
 			}
 			if( story.getBacklog() != null) {
 				Optional<Backlog> b = backlogRepository.findById(story.getBacklog().getId());

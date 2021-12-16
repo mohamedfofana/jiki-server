@@ -17,7 +17,7 @@ import com.kodakro.jiki.repository.mapper.SprintRowMapper;
 import com.kodakro.jiki.repository.request.AbstractSprintRequest;
 
 @Repository
-public class SprintRepository extends AbstractSprintRequest implements IGenericRepository<Sprint> {
+public class SprintRepository extends AbstractSprintRequest implements IGenericRepository<Sprint>, IGenericSprintRepository<Sprint> {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 
@@ -41,6 +41,7 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 		return Optional.ofNullable(sprint);
 	}
 
+	@Override
 	public Optional<Sprint> findCurrentByProjectId(Long id) {
 		final String whereSql= " AND PR.ID =? AND SP.STATUS='RUNNING'";
 		Object[] param = {id};
@@ -54,6 +55,8 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 		}
 		return Optional.ofNullable(sprint);
 	}
+	
+	@Override
 	public List<Sprint> findByProjectId(Long id) {
 		final String whereSql= " AND PR.ID =?";
 		Object[] param = {id};
@@ -62,19 +65,6 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 		sprint = jdbcTemplate.query(getJoinSelect(whereSql), param, types,
 					new SprintRowMapper());			
 		return sprint;
-	}
-	public Optional<Sprint> findCurrentByTeamId(Long id) {
-		final String whereSql= " AND PR.ID =? AND SP.STATUS='RUNNING'";
-		Object[] param = {id};
-		int[] types = {Types.INTEGER};
-		Sprint sprint = null;
-		try {
-			sprint = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
-					new SprintRowMapper());			
-		}catch(EmptyResultDataAccessException e) {
-			// log No sprint found
-		}
-		return Optional.ofNullable(sprint);
 	}
 	
 	@Override
@@ -124,6 +114,12 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 		}, keyHolder);
 		sprint.setId((long) keyHolder.getKey());
 		return sprint;
+	}
+
+	@Override
+	public Optional<Sprint> exists(Long id) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

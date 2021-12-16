@@ -12,9 +12,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import com.kodakro.jiki.model.Backlog;
 import com.kodakro.jiki.model.Team;
-import com.kodakro.jiki.repository.mapper.BacklogRowMapper;
 import com.kodakro.jiki.repository.mapper.TeamRowMapper;
 import com.kodakro.jiki.repository.request.AbstractTeamRequest;
 
@@ -76,5 +74,11 @@ public class TeamRepository extends AbstractTeamRequest implements IGenericRepos
 		}, keyHolder);
 		team.setId((long) keyHolder.getKey());
 		return team;
+	}
+
+	@Override
+	public Optional<Team> exists(Long id) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
