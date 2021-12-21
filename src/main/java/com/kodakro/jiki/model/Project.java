@@ -19,6 +19,8 @@ public class Project implements Serializable{
 	
 	private Backlog backlog;
 	
+	private Team team;
+	
 	private Date creationDate;
 	
 	private Date endDate;
