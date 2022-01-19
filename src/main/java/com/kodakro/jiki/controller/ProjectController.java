@@ -5,11 +5,11 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kodakro.jiki.exception.CustomResponseType;
 import com.kodakro.jiki.model.Project;
 import com.kodakro.jiki.service.ProjectService;
 
@@ -26,37 +27,35 @@ public class ProjectController {
 	@Autowired
 	ProjectService projectService;
 
+	@GetMapping("/all")
+	public List<Project> findAll(){
+		return projectService.findAll();
+	}
 
 	@PostMapping("/create")
-	public Project postProject(@Valid @RequestBody Project project){
-		return projectService.postProject(project);
+	public ResponseEntity<?> create(@Valid @RequestBody Project project) {
+		final Project dbProject = projectService.create(project);
+		if (dbProject == null) {
+			return new ResponseEntity<CustomResponseType<Project>>(new CustomResponseType<Project>("KO", null, "Team  "+ project.getName() + " already exists !"), HttpStatus.CONFLICT);
+		}
+		return new ResponseEntity<CustomResponseType<Project>>(new CustomResponseType<Project>("OK", dbProject, "Team created"), HttpStatus.OK);
+	}
+	
+
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<?> deleteById(@PathVariable("id") Long id){
+		final boolean status = projectService.deleteById(id);
+		if(status)
+			return new ResponseEntity<CustomResponseType<Project>>(new CustomResponseType<Project>("OK", null, "Project deleted"), HttpStatus.OK);
+		return  new ResponseEntity<CustomResponseType<Project>>(new CustomResponseType<Project>("KO", null, "Unable to delete project with id = "+ id + "."), HttpStatus.CONFLICT);
 	}
 
-	@GetMapping("/all")
-	public List<Project> getProjects(){
-		return projectService.getProjects();
-	}
-
-	@GetMapping("/{id}")
-	public Project getProjectById(@PathVariable("id") Long id){
-		return projectService.getProjectById(id);
-	}
-
-	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteProjectById(@PathVariable("id") Long id){
-		projectService.deleteProjectById(id);
-		return ResponseEntity.ok().build();
-	}
-
-	@PatchMapping("/{id}")
-	public ResponseEntity<?> patchProject(@PathVariable("id") Long id, @Valid @RequestBody Project project) {
-		projectService.patchProject(id, project);
-		return ResponseEntity.ok().build();
-	}
-
-	@PutMapping("/{id}")
-	public ResponseEntity<?> updateProject(@PathVariable("id") Long id, @Valid @RequestBody Project project){
-		projectService.updateProject(id, project);
-		return ResponseEntity.ok().build();
+	@PutMapping("/update")
+	public ResponseEntity<?> update(@Valid @RequestBody Project project){
+		final Project dbProject = projectService.update(project);
+		if (dbProject == null) {
+			return new ResponseEntity<CustomResponseType<Project>>(new CustomResponseType<Project>("KO", null, "Unable to uppdate team "+ project.getName() + "."), HttpStatus.CONFLICT);
+		}
+		return new ResponseEntity<CustomResponseType<Project>>(new CustomResponseType<Project>("OK", dbProject, "Team updated"), HttpStatus.OK);
 	}
 }

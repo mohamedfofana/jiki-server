@@ -2,6 +2,7 @@ package com.kodakro.jiki.repository.request;
 
 public abstract class AbstractBacklogRequest {
 	protected final static String TABLE = "T_BACKLOG BA";
+	protected static final String SELECT_MAX_ID = "SELECT MAX(ID) ";
 	protected static final String SELECT_SQL = "SELECT ";
 	public static final String COLUMNS_SQL = " "
 			+ "BA.ID AS ID_BA," 
@@ -16,6 +17,23 @@ public abstract class AbstractBacklogRequest {
 		+ "BA_ASS.DESCRIPTION AS DESCRIPTION_BA_ASS,"
 		+ "BA_ASS.STATUS AS STATUS_BA_ASS \n";
 	protected final String FROM_SQL="FROM "+TABLE;
+	
+	protected String getMaxId() {
+		StringBuilder sb = new StringBuilder(SELECT_MAX_ID);
+		sb.append(FROM_SQL);	
+		
+		return sb.toString();
+	}
+	
+	protected String getExists(String whereSql) {
+		StringBuilder sb = new StringBuilder(SELECT_SQL);		
+		sb.append(COLUMNS_SQL);
+		sb.append(FROM_SQL);	
+		if (whereSql != null) {
+			sb.append(whereSql);
+		}
+		return sb.toString();
+	}
 	
 	protected String getJoinSelect(String whereSql) {
 		StringBuilder sb = new StringBuilder(SELECT_SQL);		

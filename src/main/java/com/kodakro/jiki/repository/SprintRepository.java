@@ -17,7 +17,7 @@ import com.kodakro.jiki.repository.mapper.SprintRowMapper;
 import com.kodakro.jiki.repository.request.AbstractSprintRequest;
 
 @Repository
-public class SprintRepository extends AbstractSprintRequest implements IGenericRepository<Sprint>, IGenericSprintRepository<Sprint> {
+public class SprintRepository extends AbstractSprintRequest implements IGenericRepository<Sprint>, ISprintRepository {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 
@@ -68,24 +68,25 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 	}
 	
 	@Override
-	public void deleteById(Long id) {
+	public boolean deleteById(Long id) {
 		final String sql = "DELETE * FROM "+ TABLE +" WHERE SP.ID=?";
 		Optional<Sprint> sprint = findById(id);
 		Object[] param = {id};
 		int[] types = {Types.BIGINT};
 		if (sprint.isPresent())
-			jdbcTemplate.update(sql, param, types);
+			return jdbcTemplate.update(sql, param, types)==1;
+		return false;
 	}
 
 	@Override
-	public void update(Sprint sprint) {
+	public boolean update(Sprint sprint) {
 		final String sql = "UPDATE SPRINT SET TITLE='?', DESCRIPTION='?', STATUS='?', WORKFLOW='?', CREATION_DATE=?, UPDATE_DATE=?, "
 				+ " STORY_POINTS=?, BUSINESS_VALUE=?, APPLI_VERSION='?', START_DATE=?, END_DATE=?, ESTIMATED_END_DATE=? "
 				+ " WHERE ID=?";
 		Object[] param = { sprint.getTitle(), sprint.getDescription(), sprint.getStatus(), sprint.getCreationDate(), sprint.getUpdateDate(),
 				sprint.getStoryPoints(), sprint.getBusinessValue(), sprint.getAppliVersion(), sprint.getStartDate(), sprint.getEndDate(),
 				sprint.getEstimatedEndDate(),  sprint.getId()};
-		jdbcTemplate.update(sql, param);
+		return jdbcTemplate.update(sql, param)==1;
 	}
 
 	@Override
@@ -103,13 +104,13 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 			ps.setString(3, sprint.getTitle());
 			ps.setString(4, sprint.getDescription());
 			ps.setString(5, sprint.getStatus());
-			ps.setDate(6, sprint.getCreationDate());
+			ps.setTimestamp(6, sprint.getCreationDate());
 			ps.setInt(7, sprint.getStoryPoints());
 			ps.setInt(8, sprint.getBusinessValue());
 			ps.setString(9, sprint.getAppliVersion());
-			ps.setDate(10, sprint.getStartDate());
-			ps.setDate(11, sprint.getEndDate());
-			ps.setDate(12, sprint.getEstimatedEndDate());
+			ps.setTimestamp(10, sprint.getStartDate());
+			ps.setTimestamp(11, sprint.getEndDate());
+			ps.setTimestamp(12, sprint.getEstimatedEndDate());
 			return ps;
 		}, keyHolder);
 		sprint.setId((long) keyHolder.getKey());

@@ -15,8 +15,8 @@ public class BacklogRowMapper implements RowMapper<Backlog>{
 		backlog.setTitle(rs.getString("TITLE_BA"));
 		backlog.setDescription(rs.getString("DESCRIPTION_BA"));
 		backlog.setStatus(rs.getString("STATUS_BA"));
-		backlog.setCreationDate(rs.getDate("CREATION_DATE_BA"));
-		backlog.setUpdateDate(rs.getDate("UPDATE_DATE_BA"));
+		backlog.setCreationDate(rs.getTimestamp("CREATION_DATE_BA"));
+		backlog.setUpdateDate(rs.getTimestamp("UPDATE_DATE_BA"));
 		
 		return backlog;
 	}

@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,13 +31,13 @@ public class UserService {
 		return userRepository.create(user);
 	}
 	
-	@Cacheable(value="usersCache")
-	public List<User> getUsers(){
+//	@Cacheable(value="usersCache")
+	public List<User> findAll(){
 		return userRepository.findAll();
 	}
 
 	@Cacheable(value="usersCache",key="#id",unless="#result==null")
-	public User getUserById(Long id){
+	public User findById(Long id){
 		Optional<User> user= userRepository.findById(id);
 		if (user.isPresent())
 			return user.get();
@@ -47,35 +46,39 @@ public class UserService {
 	}
 	
 	@CacheEvict(value="usersCache",key="#id")
-	public void deleteUserById(Long id){
-		userRepository.deleteById(id);
+	public boolean deleteById(Long id){
+		return userRepository.deleteById(id);
 	}
 
-	public void patchUser(Long id, User user) {
-		User dbUser= userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
-		if (dbUser!=null) {
-			if (user.getFirstname() != null)
-				dbUser.setFirstname(user.getFirstname());
-			if (user.getLastname() != null)
-				dbUser.setLastname(user.getLastname());
-			if (user.getTeam() != null)
-				dbUser.setTeam(user.getTeam());
-			if (user.getStatus() != null)
-				dbUser.setStatus(user.getStatus());
-			userRepository.update(dbUser);
+	public User update(User user) {
+		if(user != null) {
+			User dbUser= userRepository.exists(user.getId()).orElseThrow(() -> new ResourceNotFoundException("User", "id", user.getId()));
+			if (dbUser!=null) {
+				if (user.getUsername() != null)
+					dbUser.setUsername(user.getUsername());
+				if (user.getFirstname() != null)
+					dbUser.setFirstname(user.getFirstname());
+				if (user.getLastname() != null)
+					dbUser.setLastname(user.getLastname());
+				if (user.getEmail() != null)
+					dbUser.setEmail(user.getEmail());
+				if (user.getStatus() != null)
+					dbUser.setStatus(user.getStatus());
+				if (user.getRole() != null)
+					dbUser.setRole(user.getRole());
+				if (user.getStatus() != null)
+					dbUser.setStatus(user.getStatus());
+				
+				if (user.getTeam() != null)
+					dbUser.setTeam(user.getTeam());
+				if (user.getProject() != null)
+					dbUser.setProject(user.getProject());
+
+				userRepository.update(dbUser);
+				return dbUser;
+			}
 		}
-	}
-	
-	@CachePut(value="usersCache",key="#id")
-	public void updateUser(Long id, User user){
-		User dbUser =  userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
-		if (dbUser!=null) {
-			dbUser.setFirstname(user.getFirstname());
-			dbUser.setLastname(user.getLastname());
-			dbUser.setTeam(user.getTeam());
-			dbUser.setStatus(user.getStatus());
-			userRepository.update(dbUser);
-		}
+		return null;
 	}
 	
 }

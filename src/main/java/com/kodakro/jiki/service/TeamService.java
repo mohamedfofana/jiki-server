@@ -1,4 +1,4 @@
-package com.kodakro.jiki.service;
+	package com.kodakro.jiki.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,43 +16,33 @@ public class TeamService {
 	@Autowired
 	TeamRepository teamRepository;
 
-	public Team postTeam(Team team){
-		return teamRepository.create(team);
-	}
-
-	public List<Team> getTeams(){
+	public List<Team> findAll(){
 		return teamRepository.findAll();
 	}
 
-	public Team getTeamById(Long id){
-		Optional<Team> team= teamRepository.findById(id);
-		if (team.isPresent())
-			return team.get();
-		else
+	public Team create(Team team) {
+		Optional<Team> dbTeam = teamRepository.exists(team.getId());
+		if (dbTeam.isPresent()) {
 			return null;
-	}
-
-	public void deleteTeamById(Long id){
-		teamRepository.deleteById(id);
-	}
-
-	public void patchTeam(Long id, Team team) {
-		Team dbTeam= teamRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Team", "id", id));
-		if (dbTeam!=null) {
-			if (team.getName() != null)
-				dbTeam.setName(team.getName());
-			if (team.getStatus() != null)
-				dbTeam.setStatus(team.getStatus());
-			teamRepository.update(dbTeam);
 		}
+		return teamRepository.create(team);
 	}
-
-	public void updateTeam(Long id, Team team){
-		Team dbTeam =  teamRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Team", "id", id));
+	
+	public Team update(Team team){
+		Team dbTeam =  teamRepository.exists(team.getId()).orElseThrow(() -> new ResourceNotFoundException("Team", "id", team.getId()));
 		if (dbTeam!=null) {
-			dbTeam.setName(team.getName());
-			dbTeam.setStatus(team.getStatus());
+			if(team.getName() != null)
+				dbTeam.setName(team.getName());
+			if(team.getStatus() != null)
+				dbTeam.setStatus(team.getStatus());
+			if(team.getUpdateDate() != null)
+				dbTeam.setUpdateDate(team.getUpdateDate());
 		}
 		teamRepository.update(dbTeam);
+		return dbTeam;
+	}
+	
+	public boolean deleteById(Long id){
+		return teamRepository.deleteById(id);
 	}
 }

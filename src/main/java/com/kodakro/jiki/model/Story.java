@@ -1,7 +1,9 @@
 package com.kodakro.jiki.model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.sql.Timestamp;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -41,13 +43,18 @@ public class Story  implements Serializable{
 	
 	private String status;
 	
-	private Date creationDate;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private Timestamp creationDate;
 	
-	private Date updateDate;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private Timestamp updateDate;
+
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private Timestamp startDate;
 	
-	private Date startDate;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")	
+	private Timestamp endDate;
 	
-	private Date endDate;
-	
-	private Date estimatedEndDate;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")	
+	private Timestamp estimatedEndDate;
 }

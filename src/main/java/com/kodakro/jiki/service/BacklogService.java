@@ -16,15 +16,11 @@ public class BacklogService {
 	@Autowired
 	BacklogRepository backlogRepository;
 
-	public List<Backlog> getBacklogs(){
+	public List<Backlog> findAll(){
 		return backlogRepository.findAll();
 	}
 
-	public Backlog postBacklog(Backlog backlog){
-		return backlogRepository.create(backlog);
-	}
-
-	public Backlog getBacklogById(Long id){
+	public Backlog findById(Long id){
 		Optional<Backlog> backlog= backlogRepository.findById(id);
 		if (backlog.isPresent())
 			return backlog.get();
@@ -32,12 +28,19 @@ public class BacklogService {
 			return null;
 	}
 
-	public void deleteBacklogById(Long id){
-		backlogRepository.deleteById(id);
+	public boolean deleteById(Long id){
+		return backlogRepository.deleteById(id);
 	}
 
-	public void patchDailymeeting(Long id, Backlog backlog) {
-		Backlog dbBacklog= backlogRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Backlog", "id", id));
+	public Backlog create(Backlog backlog) {
+		Optional<Backlog> dbBacklog = backlogRepository.exists(backlog.getId());
+		if (dbBacklog.isPresent()) {
+			return null;
+		}
+		return backlogRepository.create(backlog);
+	}
+	public void update(Backlog backlog) {
+		Backlog dbBacklog= backlogRepository.exists(backlog.getId()).orElseThrow(() -> new ResourceNotFoundException("Backlog", "id", backlog.getId()));
 		if (dbBacklog!=null) {
 			if (backlog.getTitle() != null)
 				dbBacklog.setTitle(backlog.getTitle());
@@ -45,19 +48,8 @@ public class BacklogService {
 				dbBacklog.setDescription(backlog.getDescription());
 			if (backlog.getStatus() != null)
 				dbBacklog.setStatus(backlog.getStatus());
-//			if (backlog.getBackLogReporter() != null)
-//				dbBacklog.setBackLogReporter(backlog.getBackLogReporter());
-			backlogRepository.update(dbBacklog);
-		}
-	}
-
-	public void updateBacklog(Long id, Backlog backlog){
-		Backlog dbBacklog =  backlogRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Backlog", "id", id));
-		if (dbBacklog!=null) {
-			dbBacklog.setTitle(backlog.getTitle());
-			dbBacklog.setDescription(backlog.getDescription());
-			dbBacklog.setStatus(backlog.getStatus());
-//			dbBacklog.setBackLogReporter(backlog.getBackLogReporter());
+			if (backlog.getUpdateDate() != null)
+				dbBacklog.setUpdateDate(backlog.getUpdateDate());
 			backlogRepository.update(dbBacklog);
 		}
 	}

@@ -26,11 +26,11 @@ public class StoryRowMapper extends AbstractRowMapper implements RowMapper<Story
 		story.setStoryPoints(rs.getInt("STORY_POINTS_ST"));
 		story.setBusinessValue(rs.getInt("BUSINESS_VALUE_ST"));
 		story.setAppliVersion(rs.getString("APPLI_VERSION_ST"));
-		story.setCreationDate(rs.getDate("CREATION_DATE_ST"));
-		story.setUpdateDate(rs.getDate("UPDATE_DATE_ST"));
-		story.setStartDate(rs.getDate("START_DATE_ST"));
-		story.setEndDate(rs.getDate("END_DATE_ST"));
-		story.setEstimatedEndDate(rs.getDate("ESTIMATED_END_DATE_ST"));
+		story.setCreationDate(rs.getTimestamp("CREATION_DATE_ST"));
+		story.setUpdateDate(rs.getTimestamp("UPDATE_DATE_ST"));
+		story.setStartDate(rs.getTimestamp("START_DATE_ST"));
+		story.setEndDate(rs.getTimestamp("END_DATE_ST"));
+		story.setEstimatedEndDate(rs.getTimestamp("ESTIMATED_END_DATE_ST"));
 		
 		if (isIdColumn(rs,"ID_SP_ASS")) {
 			Sprint sprint = new SprintRowMapper().mapRowAssigned(rs, rowNum);

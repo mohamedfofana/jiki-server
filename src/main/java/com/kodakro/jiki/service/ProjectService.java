@@ -16,15 +16,15 @@ public class ProjectService {
 	@Autowired
 	ProjectRepository projectRepository;
 
-	public Project postProject(Project project){
+	public Project create(Project project){
 		return projectRepository.create(project);
 	}
 
-	public List<Project> getProjects(){
+	public List<Project> findAll(){
 		return projectRepository.findAll();
 	}
 
-	public Project getProjectById(Long id){
+	public Project findById(Long id){
 		Optional<Project> project= projectRepository.findById(id);
 		if (project.isPresent())
 			return project.get();
@@ -32,27 +32,28 @@ public class ProjectService {
 			return null;
 	}
 
-	public void deleteProjectById(Long id){
-		projectRepository.deleteById(id);
+	public boolean deleteById(Long id){
+		return projectRepository.deleteById(id);
 	}
 
-	public void patchProject(Long id, Project project) {
-		Project dbProject= projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project", "id", id));
+	public Project update(Project project){
+		Project dbProject =  projectRepository.exists(project.getId()).orElseThrow(() -> new ResourceNotFoundException("Project", "id", project.getId()));
 		if (dbProject!=null) {
 			if (project.getName() != null)
 				dbProject.setName(project.getName());
+			if (project.getDescription() != null)
+				dbProject.setDescription(project.getDescription());
+			if (project.getBacklog() != null)
+				dbProject.setBacklog(project.getBacklog());
+			if (project.getTeam() != null)
+				dbProject.setTeam(project.getTeam());
 			if (project.getStatus() != null)
 				dbProject.setStatus(project.getStatus());
-			projectRepository.update(dbProject);
-		}
-	}
-
-	public void updateProject(Long id, Project project){
-		Project dbProject =  projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project", "id", id));
-		if (dbProject!=null) {
-			dbProject.setName(project.getName());
-			dbProject.setStatus(project.getStatus());
+			if (project.getUpdateDate() != null)
+				dbProject.setUpdateDate(project.getUpdateDate());
 		}
 		projectRepository.update(dbProject);
+		return dbProject;
 	}
 }
+

@@ -42,27 +42,26 @@ public class BacklogRepository extends AbstractBacklogRequest implements IGeneri
 	}
 
 	@Override
-	public void deleteById(Long id) {
-		final String sql = "DELETE * FROM "+ TABLE +" WHERE BA.ID=?";
+	public boolean deleteById(Long id) {
+		final String sql = "DELETE FROM T_BACKLOG WHERE ID=?";
 		Optional<Backlog> backlog = findById(id);
-		Object[] param = {id};
-		int[] types = {Types.BIGINT};
+		Object[] backlogId = new Object[] {id};
 		if (backlog.isPresent())
-			jdbcTemplate.update(sql, param, types);
+			return jdbcTemplate.update(sql, backlogId)==1;
+		return false;
 	}
 
 	@Override
-	public void update(Backlog t) {
-		final String sql = "UPDATE PROJECT  SET TITLE='?', DESCRIPTION='?', STATUS='?', CREATION_DATE=?, "
-				+ " END_DATE=? "
+	public boolean update(Backlog t) {
+		final String sql = "UPDATE BACKLOG  SET TITLE='?', DESCRIPTION='?', STATUS='?', UPDATE_DATE=?, "
 				+ " WHERE ID=?";
-		Object[] param = { t.getTitle(), t.getDescription(), t.getStatus(), t.getCreationDate(), t.getUpdateDate()};
-		jdbcTemplate.update(sql, param);
+		Object[] param = { t.getTitle(), t.getDescription(), t.getStatus(), t.getUpdateDate()};
+		return jdbcTemplate.update(sql, param)==1;
 	}
 
 	@Override
 	public Backlog create(Backlog t) {
-		final String sql = "INSERT INTO "+TABLE+"(TITLE, DESCRIPTION, STATUS, CREATION_DATE, UPDATE_DATE) VALUES (?,?,?,?,?,?)";
+		final String sql = "INSERT INTO "+TABLE+"(TITLE, DESCRIPTION, STATUS, CREATION_DATE) VALUES (?,?,?,?)";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 
 		jdbcTemplate.update(connection -> {
@@ -71,8 +70,8 @@ public class BacklogRepository extends AbstractBacklogRequest implements IGeneri
 			ps.setString(1, t.getTitle());
 			ps.setString(2, t.getDescription());
 			ps.setString(3, t.getStatus());
-			ps.setDate(4, t.getCreationDate());
-			ps.setDate(5, t.getUpdateDate());
+			ps.setTimestamp(4, t.getCreationDate());
+			ps.setTimestamp(5, t.getUpdateDate());
 			return ps;
 		}, keyHolder);
 		t.setId((long) keyHolder.getKey());
@@ -81,7 +80,16 @@ public class BacklogRepository extends AbstractBacklogRequest implements IGeneri
 
 	@Override
 	public Optional<Backlog> exists(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		final String whereSql= " WHERE BA.ID =? ";
+		Object[] param = {id};
+		int[] types = {Types.INTEGER};
+		Backlog backlog = null;
+		try {
+			backlog = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
+					new BacklogRowMapper());
+		}catch (EmptyResultDataAccessException e) {
+			// log no enity found
+		}
+		return Optional.ofNullable(backlog);
 	}
 }

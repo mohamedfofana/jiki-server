@@ -17,7 +17,7 @@ import com.kodakro.jiki.repository.mapper.StoryRowMapper;
 import com.kodakro.jiki.repository.request.AbstractStoryRequest;
 
 @Repository
-public class StoryRepository extends AbstractStoryRequest  implements IGenericRepository<Story>, IGenericStoryRepository<Story> {
+public class StoryRepository extends AbstractStoryRequest  implements IGenericRepository<Story>, IStoryRepository {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 
@@ -90,24 +90,25 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 	}
 
 	@Override
-	public void deleteById(Long id) {
+	public boolean deleteById(Long id) {
 		final String sql = "DELETE * FROM "+TABLE+" WHERE ST.ID=?";
 		Optional<Story> story = findById(id);
 		Object[] param = {id};
 		int[] types = {Types.BIGINT};
 		if (story.isPresent())
-			jdbcTemplate.update(sql, param, types);
+			return jdbcTemplate.update(sql, param, types)==1;
+		return false;
 	}
 
 	@Override
-	public void update(Story story) {
+	public boolean update(Story story) {
 		final String sql = "UPDATE "+TABLE+" SET TITLE='?', DESCRIPTION='?', TYPE=?, STATUS='?', PRIORITY=?, WORKFLOW='?', CREATION_DATE=?, UPDATE_DATE=?, "
 				+ " STORY_POINTS=?, BUSINESS_VALUE=?, APPLI_VERSION='?', START_DATE=?, END_DATE=?, ESTIMATED_END_DATE=? "
 				+ " WHERE ID=?";
 		Object[] param = { story.getTitle(), story.getDescription(), story.getType(), story.getStatus(), story.getPriority(), story.getCreationDate(), story.getUpdateDate(),
 				story.getStoryPoints(), story.getBusinessValue(), story.getAppliVersion(), story.getStartDate(), story.getEndDate(),
 				story.getEstimatedEndDate(),  story.getId()};
-		jdbcTemplate.update(sql, param);
+		return jdbcTemplate.update(sql, param)==1;
 	}
 
 	public void updateStatus(Story story) {
@@ -153,14 +154,14 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 			ps.setString(9, story.getStatus());
 			ps.setString(10, story.getPriority());
 			ps.setString(11, story.getWorkflow());
-			ps.setDate(12, story.getCreationDate());
-			ps.setDate(13, story.getUpdateDate());
+			ps.setTimestamp(12, story.getCreationDate());
+			ps.setTimestamp(13, story.getUpdateDate());
 			ps.setInt(14, story.getStoryPoints());
 			ps.setInt(15, story.getBusinessValue());
 			ps.setString(16, story.getAppliVersion());
-			ps.setDate(17, story.getStartDate());
-			ps.setDate(18, story.getEndDate());
-			ps.setDate(19, story.getEstimatedEndDate());
+			ps.setTimestamp(17, story.getStartDate());
+			ps.setTimestamp(18, story.getEndDate());
+			ps.setTimestamp(19, story.getEstimatedEndDate());
 			return ps;
 		}, keyHolder);
 		story.setId((long) keyHolder.getKey());

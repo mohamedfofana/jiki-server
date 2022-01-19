@@ -19,10 +19,11 @@ public class UserRowMapper extends AbstractRowMapper implements RowMapper<User>{
 		user.setLastname(rs.getString("LASTNAME_US"));
 		user.setUsername(rs.getString("USERNAME_US"));
 		user.setPassword(rs.getString("PASSWORD_US"));
+		user.setEmail(rs.getString("EMAIL_US"));
 		user.setStatus(rs.getString("STATUS_US"));
 		user.setRole(rs.getString("ROLE_US"));
-		user.setCreationDate(rs.getDate("CREATION_DATE_US"));
-		user.setUpdateDate(rs.getDate("UPDATE_DATE_US"));
+		user.setCreationDate(rs.getTimestamp("CREATION_DATE_US"));
+		user.setUpdateDate(rs.getTimestamp("UPDATE_DATE_US"));
 		if (isIdColumn(rs, "ID_TE")) {
 			Team team = new TeamRowMapper().mapRow(rs, rowNum);
 			user.setTeam(team);
@@ -51,6 +52,7 @@ public class UserRowMapper extends AbstractRowMapper implements RowMapper<User>{
 		user.setId(rs.getLong("ID_US_RE"));
 		user.setFirstname(rs.getString("FIRSTNAME_US_RE"));
 		user.setLastname(rs.getString("LASTNAME_US_RE"));
+		user.setEmail(rs.getString("EMAIL_US_RE"));
 		user.setRole(rs.getString("ROLE_US_RE"));
 		return user;
 	}
@@ -59,6 +61,7 @@ public class UserRowMapper extends AbstractRowMapper implements RowMapper<User>{
 		user.setId(rs.getLong("ID_US_ASS"));
 		user.setFirstname(rs.getString("FIRSTNAME_US_ASS"));
 		user.setLastname(rs.getString("LASTNAME_US_ASS"));
+		user.setEmail(rs.getString("EMAIL_US_ASS"));
 		user.setRole(rs.getString("ROLE_US_ASS"));
 		return user;
 	}

@@ -14,8 +14,8 @@ public class TeamRowMapper implements RowMapper<Team>{
 		team.setId(rs.getLong("ID_TE"));
 		team.setName(rs.getString("NAME_TE"));
 		team.setStatus(rs.getString("STATUS_TE"));
-		team.setCreationDate(rs.getDate("CREATION_DATE_TE"));
-		team.setUpdateDate(rs.getDate("UPDATE_DATE_TE"));
+		team.setCreationDate(rs.getTimestamp("CREATION_DATE_TE"));
+		team.setUpdateDate(rs.getTimestamp("UPDATE_DATE_TE"));
 		return team;
 	}
 	

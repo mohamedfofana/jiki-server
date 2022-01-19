@@ -2,14 +2,13 @@ package com.kodakro.jiki.repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Types;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.kodakro.jiki.model.Project;
@@ -26,6 +25,11 @@ public class ProjectRepository extends AbstractProjectRequest implements IGeneri
 		return jdbcTemplate.query(getJoinSelect(null), new ProjectRowMapper());
 	}
 
+	public Long maxId() {
+		final Long maxId = jdbcTemplate.queryForObject(getMaxId(), null, null, Long.class );
+		return maxId!=null?maxId:1;
+	}
+	
 	@Override
 	public Optional<Project> findById(Long id) {
 		final String whereSql= " AND PR.ID =? ";
@@ -42,31 +46,30 @@ public class ProjectRepository extends AbstractProjectRequest implements IGeneri
 	}
 
 	@Override
-	public void deleteById(Long id) {
-		final String sql = "DELETE * FROM "+TABLE+" WHERE ST.ID=?";
-		Optional<Project> project = findById(id);
-		Object[] param = {id};
-		int[] types = {Types.BIGINT};
-		if (project.isPresent())
-			jdbcTemplate.update(sql, param, types);
-		
+	public boolean deleteById(Long id) {
+		final String sql = "DELETE FROM T_PROJECT WHERE ID=?";
+		Optional<Project> project = exists(id);
+		Object[] teamId = new Object[] {id};
+		if (project.isPresent()) {
+		    return jdbcTemplate.update(sql, teamId)==1;
+		}
+		return false;
 	}
 
 	@Override
-	public void update(Project project ) {
-		final String sql = "UPDATE PROJECT  SET NAME='?', DESCRIPTION='?', STATUS='?', CREATION_DATE=?, UPDATE_DATE=?, "
-				+ " END_DATE=? "
+	public boolean update(Project project ) {
+		final String sql = "UPDATE T_PROJECT SET NAME=?, DESCRIPTION=?, STATUS=?, TEAM_ID=?, UPDATE_DATE=? "
 				+ " WHERE ID=?";
-		Object[] param = { project.getName(), project.getDescription(), project.getStatus(), project.getCreationDate(), project.getUpdateDate(), project.getEndDate(),
+		Object[] param = { project.getName(), project.getDescription(), project.getStatus(), project.getTeam().getId(),LocalDate.now(), 
 				project.getId()};
-		jdbcTemplate.update(sql, param);
+		return jdbcTemplate.update(sql, param)==1;
 		
 	}
 
 	@Override
 	public Project create(Project project) {
-		final String sql = "INSERT INTO "+TABLE+"(NAME, DESCRIPTION, STATUS, CREATION_DATE) VALUES (?,?,?,?)";
-		KeyHolder keyHolder = new GeneratedKeyHolder();
+		final String sql = "INSERT INTO T_PROJECT (NAME, DESCRIPTION, STATUS, TEAM_ID, CREATION_DATE) VALUES (?,?,?,?,?)";
+		project.setId(maxId()+1);
 
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection
@@ -74,17 +77,26 @@ public class ProjectRepository extends AbstractProjectRequest implements IGeneri
 			ps.setString(1, project.getName());
 			ps.setString(2, project.getDescription());
 			ps.setString(3, project.getStatus());
-			ps.setDate(4, project.getCreationDate());
+			ps.setLong(4, project.getTeam().getId());
+			ps.setTimestamp(5, project.getCreationDate());
 			return ps;
-		}, keyHolder);
-		project.setId(keyHolder.getKey().longValue());
+		});
 		return project;
 	}
 
 	@Override
 	public Optional<Project> exists(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		final String whereSql= " WHERE PR.ID =? ";
+		Object[] param = {id};
+		int[] types = {Types.INTEGER};
+		Project project = null;
+		try {
+			project = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
+					new ProjectRowMapper());
+		}catch (EmptyResultDataAccessException e) {
+			// log no user found
+		}
+		return Optional.ofNullable(project);
 	}
 
 }

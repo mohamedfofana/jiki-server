@@ -8,8 +8,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.kodakro.jiki.model.Team;
@@ -26,6 +24,11 @@ public class TeamRepository extends AbstractTeamRequest implements IGenericRepos
 		return jdbcTemplate.query(getJoinSelect(null), new TeamRowMapper());
 	}
 
+	public Long maxId() {
+		final Long maxId = jdbcTemplate.queryForObject(getMaxId(), null, null, Long.class );
+		return maxId!=null?maxId:1;
+	}
+	
 	@Override
 	public Optional<Team> findById(Long id) {
 		Object[] param = {id};
@@ -41,44 +44,52 @@ public class TeamRepository extends AbstractTeamRequest implements IGenericRepos
 	}
 
 	@Override
-	public void deleteById(Long id) {
-		final String sql = "DELETE * FROM "+TABLE+" WHERE ID=?";
-		Optional<Team> team = findById(id);
-		Object[] param = {id};
-		int[] types = {Types.INTEGER};
-		if (team.isPresent())
-			jdbcTemplate.update(sql, param, types);
+	public boolean deleteById(Long id) {
+		final String sql = "DELETE FROM T_TEAM WHERE ID=?";
+		Optional<Team> team = exists(id);
+		Object[] teamId = new Object[] {id};
+		if (team.isPresent()) {
+			return jdbcTemplate.update(sql, teamId)==1;
+		}
+		return false;
 	}
 
 	@Override
-	public void update(Team team) {
-		final String sql = "UPDATE "+TABLE+" SET NAME='?', STATUS='?', CREATION_DATE=?, UPDATE_DATE=?"
+	public boolean update(Team team) {
+		final String sql = "UPDATE "+TABLE+" SET NAME=?, STATUS=?, UPDATE_DATE=?"
 				+ " WHERE ID=?";
-		Object[] param = { team.getName(), team.getStatus(), team.getCreationDate(), team.getUpdateDate()};
-		jdbcTemplate.update(sql, param);
+		Object[] param = { team.getName(), team.getStatus(), team.getUpdateDate(), team.getId()};
+		return jdbcTemplate.update(sql, param) == 1;
 	}
 
 	@Override
 	public Team create(Team team) {
-		final String sql = "INSERT INTO "+TABLE+"(TITLE, STATUS, CREATION_DATE, UPDATE_DATE) VALUES (?,?,?,?)";
-		KeyHolder keyHolder = new GeneratedKeyHolder();
+		final String sql = "INSERT INTO "+TABLE+" (NAME, STATUS, CREATION_DATE) VALUES (?,?,?)";
+		team.setId(maxId()+1);
 
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection
 					.prepareStatement(sql);
 			ps.setString(1, team.getName());
 			ps.setString(2, team.getStatus());
-			ps.setDate(3, team.getCreationDate());
-			ps.setDate(4, team.getUpdateDate());
+			ps.setTimestamp(3, team.getCreationDate());
 			return ps;
-		}, keyHolder);
-		team.setId((long) keyHolder.getKey());
+		});
 		return team;
 	}
 
 	@Override
 	public Optional<Team> exists(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		final String whereSql= " WHERE TE.ID =? ";
+		Object[] param = {id};
+		int[] types = {Types.INTEGER};
+		Team team = null;
+		try {
+			team = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
+					new TeamRowMapper());
+		}catch (EmptyResultDataAccessException e) {
+			// log no entity found
+		}
+		return Optional.ofNullable(team);
 	}
 }

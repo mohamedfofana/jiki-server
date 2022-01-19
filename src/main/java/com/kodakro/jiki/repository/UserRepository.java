@@ -2,10 +2,12 @@ package com.kodakro.jiki.repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Types;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -13,12 +15,11 @@ import org.springframework.stereotype.Repository;
 import com.kodakro.jiki.enums.RoleEnum;
 import com.kodakro.jiki.enums.StatusEnum;
 import com.kodakro.jiki.model.User;
-import com.kodakro.jiki.repository.mapper.UserAuthRowMapper;
 import com.kodakro.jiki.repository.mapper.UserRowMapper;
 import com.kodakro.jiki.repository.request.AbstractUserRequest;
 
 @Repository
-public class UserRepository extends AbstractUserRequest implements IGenericRepository<User> {
+public class UserRepository extends AbstractUserRequest implements IGenericRepository<User>, IUserRepository {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 
@@ -38,6 +39,11 @@ public class UserRepository extends AbstractUserRequest implements IGenericRepos
 		return Optional.ofNullable(user);
 	}
 
+	public Long maxId() {
+		final Long maxId = jdbcTemplate.queryForObject(getMaxId(), null, null, Long.class );
+		return maxId!=null?maxId:1;
+	}
+	
 	public Optional<User> findOneByUsername(String username) {
 		final String whereSql = " WHERE US.USERNAME =?";
 		Object[] param = {username};
@@ -54,26 +60,28 @@ public class UserRepository extends AbstractUserRequest implements IGenericRepos
 	}
 	
 	@Override
-	public void deleteById(Long id) {
-		final String sql = "DELETE * FROM T_USER WHERE ID=?";
-		Optional<User> user = findById(id);
-		Object[] param = {id};
-		int[] types = {Types.INTEGER};
-		if (user.isPresent())
-			jdbcTemplate.update(sql, param, types);
+	public boolean deleteById(Long id) {
+		final String sql = "DELETE FROM T_USER WHERE ID=?";
+		Optional<User> user = exists(id);
+		 Object[] userId = new Object[] {id};
+		if (user.isPresent()) {
+			return jdbcTemplate.update(sql, userId)==1;
+		}
+		return false;
 	}
 
 	@Override
-	public void update(User user) {
-		final String sql = "UPDATE T_USER SET FIRSTNAME='?', LASTNAME='?', USERNAME='?', ROLE=?, STATUS='?', UPDATE_DATE=?"
+	public boolean update(User user) {
+		final String sql = "UPDATE T_USER SET FIRSTNAME=?, LASTNAME=?, USERNAME=?, EMAIL=?, ROLE=?, STATUS=?, TEAM_ID=?, PROJECT_ID=?, UPDATE_DATE=?"
 				+ " WHERE ID=?";
-		Object[] param = { user.getFirstname(), user.getLastname(), user.getUsername(), user.getStatus(), user.getUpdateDate()};
-		jdbcTemplate.update(sql, param);
+		Object[] param = { user.getFirstname(), user.getLastname(), user.getUsername(), user.getEmail(), user.getRole(), user.getStatus(), user.getTeam().getId(), user.getProject().getId(), LocalDate.now(), user.getId()};
+		return jdbcTemplate.update(sql, param)==1;
 	}
 
 	@Override
 	public User create(User user) {
-		final String sql = "INSERT INTO T_USER (ID, TEAM_ID, PROJECT_ID,FIRSTNAME, LASTNAME, USERNAME, PASSWORD, ROLE, STATUS, CREATION_DATE) VALUES (?,?,?,?,?,?,?,?,?,?)";
+		final String sql = "INSERT INTO T_USER (ID, TEAM_ID, PROJECT_ID,FIRSTNAME, LASTNAME, USERNAME, EMAIL, PASSWORD, ROLE, STATUS, CREATION_DATE) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+		user.setId(maxId()+1);
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection
 					.prepareStatement(sql);
@@ -83,10 +91,11 @@ public class UserRepository extends AbstractUserRequest implements IGenericRepos
 			ps.setString(4, user.getFirstname());
 			ps.setString(5, user.getLastname());
 			ps.setString(6, user.getUsername());
-			ps.setString(7, user.getPassword());
-			ps.setString(8, user.getRole()==null? RoleEnum.USER.toString():user.getRole());
-			ps.setString(9, user.getStatus()==null? StatusEnum.ACTIVE.toString():user.getStatus());
-			ps.setDate(10, user.getCreationDate());
+			ps.setString(7, user.getEmail());
+			ps.setString(8, user.getPassword());
+			ps.setString(9, user.getRole()==null? RoleEnum.USER.toString():user.getRole());
+			ps.setString(10, user.getStatus()==null? StatusEnum.ACTIVE.toString():user.getStatus());
+			ps.setTimestamp(11, user.getCreationDate());
 			return ps;
 		});
 		return user;
@@ -94,8 +103,17 @@ public class UserRepository extends AbstractUserRequest implements IGenericRepos
 
 	@Override
 	public Optional<User> exists(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		final String whereSql= " WHERE US.ID =? ";
+		Object[] param = {id};
+		int[] types = {Types.INTEGER};
+		User user = null;
+		try {
+			user = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
+					new UserRowMapper());
+		}catch (EmptyResultDataAccessException e) {
+			// log no user found
+		}
+		return Optional.ofNullable(user);
 	}
 
 }

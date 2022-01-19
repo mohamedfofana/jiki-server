@@ -1,6 +1,6 @@
 package com.kodakro.jiki.model;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -31,6 +31,8 @@ public class User implements UserDetails{
 
 	private String lastname;
 	
+	private String email;
+	
 	private String password;
 
 	private String role;
@@ -38,10 +40,10 @@ public class User implements UserDetails{
 	private String status;
 
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private Date creationDate;
+	private Timestamp creationDate;
 	
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private Date updateDate;
+	private Timestamp updateDate;
 	
 	@JsonIgnore
 	private Set<? extends GrantedAuthority> authorities = new HashSet<>();

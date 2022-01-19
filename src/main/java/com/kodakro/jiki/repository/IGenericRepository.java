@@ -28,12 +28,12 @@ public interface IGenericRepository<T> {
 	 * 
 	 * Remove the record from the database
 	 */
-	void deleteById(Long id);
+	boolean deleteById(Long id);
 
 	/*
 	 * Update all fields in the record
 	 */
-	void update(T t);
+	boolean update(T t);
 
 	/*
 	 * 

@@ -57,12 +57,12 @@ public class SprintController {
 
 	}
 	@GetMapping("/project/{id}")
-	public List<Sprint> getSprintsByProjectId(@PathVariable("id") Long id){
+	public List<Sprint> findByProjectId(@PathVariable("id") Long id){
 		return sprintRepository.findByProjectId(id);
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?>  deleteSprint(@PathVariable("id") Long id){
+	public ResponseEntity<?>  deleteById(@PathVariable("id") Long id){
 		sprintRepository.deleteById(id);
 		return ResponseEntity.ok().build();
 	}
