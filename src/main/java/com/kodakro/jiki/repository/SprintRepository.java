@@ -25,7 +25,13 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 	public List<Sprint> findAll() {
 		return jdbcTemplate.query(getJoinSelect(null), new SprintRowMapper());
 	}
-
+	
+	@Override
+	public Long maxId() {
+		final Long maxId = jdbcTemplate.queryForObject(getMaxId(), null, null, Long.class );
+		return maxId!=null?maxId:1;
+	}
+	
 	@Override
 	public Optional<Sprint> findById(Long id) {
 		final String whereSql= " AND SP.ID =?";

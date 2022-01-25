@@ -3,6 +3,7 @@ package com.kodakro.jiki.repository.request;
 public abstract class AbstractSprintRequest {
 	protected final static String TABLE = "T_SPRINT SP";
 	protected static final String SELECT_SQL = "SELECT ";
+	protected static final String SELECT_MAX_ID = "SELECT MAX(ID) ";
 	public static final String COLUMNS_SQL = " "
 		+ "SP.ID AS ID_SP," 
 		+ "SP.REPORTER_ID AS REPORTER_ID_SP," 
@@ -38,6 +39,13 @@ public abstract class AbstractSprintRequest {
 	protected final String FROM_SQL="FROM "+TABLE;
 	protected static final String JOIN_REPORTER = " INNER JOIN T_USER US_RE ON US_RE.ID = SP.REPORTER_ID";
 	protected static final String JOIN_PROJECT = " INNER JOIN T_PROJECT PR ON PR.ID = SP.PROJECT_ID";
+	
+	protected String getMaxId() {
+		StringBuilder sb = new StringBuilder(SELECT_MAX_ID);
+		sb.append(FROM_SQL);	
+		
+		return sb.toString();
+	}
 	
 	protected String getJoinSelect(String whereSql) {
 		StringBuilder sb = new StringBuilder(SELECT_SQL);		

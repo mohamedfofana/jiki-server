@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.kodakro.jiki.exception.ResourceNotFoundException;
+import com.kodakro.jiki.model.Backlog;
 import com.kodakro.jiki.model.Project;
+import com.kodakro.jiki.repository.BacklogRepository;
 import com.kodakro.jiki.repository.ProjectRepository;
 
 @Service
@@ -15,8 +17,18 @@ public class ProjectService {
 	
 	@Autowired
 	ProjectRepository projectRepository;
+	@Autowired
+	BacklogRepository backlogRepository;
 
 	public Project create(Project project){
+		final Backlog backlog = new Backlog();
+		backlog.setTitle("Backlog " + project.getName());
+		backlog.setDescription("Backlog " + project.getDescription());	
+		backlog.setCreationDate(project.getCreationDate());
+		final Backlog dbBacklog = backlogRepository.create(backlog);
+		if (dbBacklog == null)
+			return null;
+		project.setBacklog(dbBacklog);
 		return projectRepository.create(project);
 	}
 
@@ -33,7 +45,14 @@ public class ProjectService {
 	}
 
 	public boolean deleteById(Long id){
-		return projectRepository.deleteById(id);
+		final Project project = findById(id);
+		if (project == null) {
+			return true;
+		}
+		if (backlogRepository.deleteById(project.getBacklog().getId())){
+			return projectRepository.deleteById(id);
+		}
+		return false;
 	}
 
 	public Project update(Project project){

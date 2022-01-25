@@ -8,8 +8,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.kodakro.jiki.model.Backlog;
@@ -24,6 +22,12 @@ public class BacklogRepository extends AbstractBacklogRequest implements IGeneri
 	@Override
 	public List<Backlog> findAll() {
 		return jdbcTemplate.query(getJoinSelect(null), new BacklogRowMapper());
+	}
+	
+	@Override
+	public Long maxId() {
+		final Long maxId = jdbcTemplate.queryForObject(getMaxId(), null, null, Long.class );
+		return maxId!=null?maxId:1;
 	}
 
 	@Override
@@ -53,29 +57,29 @@ public class BacklogRepository extends AbstractBacklogRequest implements IGeneri
 
 	@Override
 	public boolean update(Backlog t) {
-		final String sql = "UPDATE BACKLOG  SET TITLE='?', DESCRIPTION='?', STATUS='?', UPDATE_DATE=?, "
+		final String sql = "UPDATE T_BACKLOG  SET TITLE='?', DESCRIPTION='?', STATUS='?', UPDATE_DATE=?, "
 				+ " WHERE ID=?";
 		Object[] param = { t.getTitle(), t.getDescription(), t.getStatus(), t.getUpdateDate()};
 		return jdbcTemplate.update(sql, param)==1;
 	}
 
 	@Override
-	public Backlog create(Backlog t) {
-		final String sql = "INSERT INTO "+TABLE+"(TITLE, DESCRIPTION, STATUS, CREATION_DATE) VALUES (?,?,?,?)";
-		KeyHolder keyHolder = new GeneratedKeyHolder();
+	public Backlog create(Backlog backlog) {
+		final String sql = "INSERT INTO T_BACKLOG (ID, TITLE, DESCRIPTION, STATUS, CREATION_DATE) VALUES (?,?,?,?,?)";
+		backlog.setId(maxId()+1);
 
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection
 					.prepareStatement(sql);
-			ps.setString(1, t.getTitle());
-			ps.setString(2, t.getDescription());
-			ps.setString(3, t.getStatus());
-			ps.setTimestamp(4, t.getCreationDate());
-			ps.setTimestamp(5, t.getUpdateDate());
+			ps.setLong(1, backlog.getId());
+			ps.setString(2, backlog.getTitle());
+			ps.setString(3, backlog.getDescription());
+			ps.setString(4, backlog.getStatus());
+			ps.setTimestamp(5, backlog.getCreationDate());
 			return ps;
-		}, keyHolder);
-		t.setId((long) keyHolder.getKey());
-		return t;
+		});
+
+		return backlog;
 	}
 
 	@Override

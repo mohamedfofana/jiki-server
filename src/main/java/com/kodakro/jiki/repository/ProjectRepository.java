@@ -25,6 +25,7 @@ public class ProjectRepository extends AbstractProjectRequest implements IGeneri
 		return jdbcTemplate.query(getJoinSelect(null), new ProjectRowMapper());
 	}
 
+	@Override
 	public Long maxId() {
 		final Long maxId = jdbcTemplate.queryForObject(getMaxId(), null, null, Long.class );
 		return maxId!=null?maxId:1;
@@ -68,17 +69,19 @@ public class ProjectRepository extends AbstractProjectRequest implements IGeneri
 
 	@Override
 	public Project create(Project project) {
-		final String sql = "INSERT INTO T_PROJECT (NAME, DESCRIPTION, STATUS, TEAM_ID, CREATION_DATE) VALUES (?,?,?,?,?)";
+		final String sql = "INSERT INTO T_PROJECT (ID, NAME, DESCRIPTION, STATUS, TEAM_ID, BACKLOG_ID, CREATION_DATE) VALUES (?,?,?,?,?,?,?)";
 		project.setId(maxId()+1);
 
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection
 					.prepareStatement(sql);
-			ps.setString(1, project.getName());
-			ps.setString(2, project.getDescription());
-			ps.setString(3, project.getStatus());
-			ps.setLong(4, project.getTeam().getId());
-			ps.setTimestamp(5, project.getCreationDate());
+			ps.setLong(1, project.getId());
+			ps.setString(2, project.getName());
+			ps.setString(3, project.getDescription());
+			ps.setString(4, project.getStatus());
+			ps.setLong(5, project.getTeam().getId());
+			ps.setLong(6, project.getBacklog().getId());
+			ps.setTimestamp(7, project.getCreationDate());
 			return ps;
 		});
 		return project;

@@ -25,6 +25,12 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 	public List<Story> findAll() {
 		return jdbcTemplate.query(getJoinSelect(null), new StoryRowMapper());
 	}
+	
+	@Override
+	public Long maxId() {
+		final Long maxId = jdbcTemplate.queryForObject(getMaxId(), null, null, Long.class );
+		return maxId!=null?maxId:1;
+	}
 
 	@Override
 	public Optional<Story> exists(Long id) {

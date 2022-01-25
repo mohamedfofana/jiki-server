@@ -3,7 +3,7 @@ package com.kodakro.jiki.repository.request;
 public abstract class AbstractStoryRequest {
 	protected final static String TABLE = "T_STORY ST";
 	protected static final String SELECT_SQL = "SELECT ";
-	
+	protected static final String SELECT_MAX_ID = "SELECT MAX(ID) ";
 	public static final String SIMPLE_COLUMNS_SQL = " "
 			+ "ST.ID AS ID_ST,"
 			+ "ST.REPORTER_ID AS REPORTER_ID_ST,"
@@ -60,6 +60,12 @@ public abstract class AbstractStoryRequest {
 	protected static final String LEFT_JOIN_ASSIGNED_TEAM =" LEFT JOIN T_TEAM TE_ASS ON TE_ASS.ID = ST.ASSIGNED_TEAM_ID ";
 	protected static final String LEFT_JOIN_ASSIGNED_USER =" LEFT JOIN T_USER US_ASS ON US_ASS.ID = ST.ASSIGNED_USER_ID ";
 	
+	protected String getMaxId() {
+		StringBuilder sb = new StringBuilder(SELECT_MAX_ID);
+		sb.append(FROM_SQL);	
+		
+		return sb.toString();
+	}
 	protected String getExists(String whereSql) {
 		StringBuilder sb = new StringBuilder(SELECT_SQL);		
 		sb.append(SIMPLE_COLUMNS_SQL);

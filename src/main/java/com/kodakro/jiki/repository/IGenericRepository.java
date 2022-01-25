@@ -10,6 +10,8 @@ public interface IGenericRepository<T> {
 	 */
 	List<T> findAll();
 
+	Long maxId();
+	
 	/*
 	 * find if a record exists 
 	 * @param id

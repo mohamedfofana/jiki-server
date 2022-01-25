@@ -23,7 +23,8 @@ public class TeamRepository extends AbstractTeamRequest implements IGenericRepos
 	public List<Team> findAll() {
 		return jdbcTemplate.query(getJoinSelect(null), new TeamRowMapper());
 	}
-
+   
+	@Override
 	public Long maxId() {
 		final Long maxId = jdbcTemplate.queryForObject(getMaxId(), null, null, Long.class );
 		return maxId!=null?maxId:1;
@@ -64,15 +65,16 @@ public class TeamRepository extends AbstractTeamRequest implements IGenericRepos
 
 	@Override
 	public Team create(Team team) {
-		final String sql = "INSERT INTO "+TABLE+" (NAME, STATUS, CREATION_DATE) VALUES (?,?,?)";
+		final String sql = "INSERT INTO "+TABLE+" (ID,NAME, STATUS, CREATION_DATE) VALUES (?,?,?,?)";
 		team.setId(maxId()+1);
 
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection
 					.prepareStatement(sql);
-			ps.setString(1, team.getName());
-			ps.setString(2, team.getStatus());
-			ps.setTimestamp(3, team.getCreationDate());
+			ps.setLong(1, team.getId());
+			ps.setString(2, team.getName());
+			ps.setString(3, team.getStatus());
+			ps.setTimestamp(4, team.getCreationDate());
 			return ps;
 		});
 		return team;
