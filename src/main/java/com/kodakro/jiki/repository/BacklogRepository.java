@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.kodakro.jiki.model.Backlog;
+import com.kodakro.jiki.repository.intrf.IGenericRepository;
 import com.kodakro.jiki.repository.mapper.BacklogRowMapper;
 import com.kodakro.jiki.repository.request.AbstractBacklogRequest;
 
@@ -19,6 +21,16 @@ public class BacklogRepository extends AbstractBacklogRequest implements IGeneri
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 
+	
+	@Value("${sql.backlog.insert}")
+	private String sqlInsert;
+	
+	@Value("${sql.backlog.update}")
+	private String sqlUpdate;
+	
+	@Value("${sql.backlog.delete}")
+	private String sqlDelete;
+	
 	@Override
 	public List<Backlog> findAll() {
 		return jdbcTemplate.query(getJoinSelect(null), new BacklogRowMapper());
@@ -47,30 +59,26 @@ public class BacklogRepository extends AbstractBacklogRequest implements IGeneri
 
 	@Override
 	public boolean deleteById(Long id) {
-		final String sql = "DELETE FROM T_BACKLOG WHERE ID=?";
 		Optional<Backlog> backlog = findById(id);
 		Object[] backlogId = new Object[] {id};
 		if (backlog.isPresent())
-			return jdbcTemplate.update(sql, backlogId)==1;
+			return jdbcTemplate.update(sqlDelete, backlogId)==1;
 		return false;
 	}
 
 	@Override
 	public boolean update(Backlog t) {
-		final String sql = "UPDATE T_BACKLOG  SET TITLE='?', DESCRIPTION='?', STATUS='?', UPDATE_DATE=?, "
-				+ " WHERE ID=?";
 		Object[] param = { t.getTitle(), t.getDescription(), t.getStatus(), t.getUpdateDate()};
-		return jdbcTemplate.update(sql, param)==1;
+		return jdbcTemplate.update(sqlUpdate, param)==1;
 	}
 
 	@Override
 	public Backlog create(Backlog backlog) {
-		final String sql = "INSERT INTO T_BACKLOG (ID, TITLE, DESCRIPTION, STATUS, CREATION_DATE) VALUES (?,?,?,?,?)";
 		backlog.setId(maxId()+1);
 
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection
-					.prepareStatement(sql);
+					.prepareStatement(sqlInsert);
 			ps.setLong(1, backlog.getId());
 			ps.setString(2, backlog.getTitle());
 			ps.setString(3, backlog.getDescription());

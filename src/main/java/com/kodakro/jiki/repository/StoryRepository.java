@@ -6,13 +6,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.kodakro.jiki.model.Story;
+import com.kodakro.jiki.repository.intrf.IGenericRepository;
+import com.kodakro.jiki.repository.intrf.IStoryRepository;
 import com.kodakro.jiki.repository.mapper.StoryRowMapper;
 import com.kodakro.jiki.repository.request.AbstractStoryRequest;
 
@@ -20,7 +21,16 @@ import com.kodakro.jiki.repository.request.AbstractStoryRequest;
 public class StoryRepository extends AbstractStoryRequest  implements IGenericRepository<Story>, IStoryRepository {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-
+	
+	@Value("${sql.story.insert}")
+	private String sqlInsert;
+	
+	@Value("${sql.story.update}")
+	private String sqlUpdate;
+	
+	@Value("${sql.story.delete}")
+	private String sqlDelete;
+	
 	@Override
 	public List<Story> findAll() {
 		return jdbcTemplate.query(getJoinSelect(null), new StoryRowMapper());
@@ -141,36 +151,36 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 	
 	@Override
 	public Story create(Story story) {
-		final String sql = "INSERT INTO "+TABLE+"(REPORTER_ID, SPRINT_ID, BACKLOG_ID, ASSIGNED_TEAM_ID, ASSIGNED_USER_ID, TITLE, DESCRIPTION, TYPE, STATUS, PRIORITY, WORKFLOW, "
+		final String sql = "INSERT INTO "+TABLE+"(ID,REPORTER_ID, SPRINT_ID, BACKLOG_ID, ASSIGNED_TEAM_ID, ASSIGNED_USER_ID, TITLE, DESCRIPTION, TYPE, STATUS, PRIORITY, WORKFLOW, "
 				+ "CREATION_DATE, UPDATE_DATE, STORY_POINTS, BUSINESS_VALUE, APPLI_VERSION, START_DATE, "
 				+ "END_DATE, ESTIMATED_END_DATE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-		KeyHolder keyHolder = new GeneratedKeyHolder();
+		story.setId(maxId()+1);
 
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection
 					.prepareStatement(sql);
-			ps.setLong(1, story.getReporter().getId());
-			ps.setLong(2, story.getSprint().getId());
-			ps.setLong(3, story.getBacklog().getId());
-			ps.setLong(4, story.getAssignedTeam().getId());
-			ps.setLong(5, story.getAssignedUser().getId());
-			ps.setString(6, story.getTitle());
-			ps.setString(7, story.getDescription());
-			ps.setString(8, story.getType());
-			ps.setString(9, story.getStatus());
-			ps.setString(10, story.getPriority());
-			ps.setString(11, story.getWorkflow());
-			ps.setTimestamp(12, story.getCreationDate());
-			ps.setTimestamp(13, story.getUpdateDate());
-			ps.setInt(14, story.getStoryPoints());
-			ps.setInt(15, story.getBusinessValue());
-			ps.setString(16, story.getAppliVersion());
-			ps.setTimestamp(17, story.getStartDate());
-			ps.setTimestamp(18, story.getEndDate());
-			ps.setTimestamp(19, story.getEstimatedEndDate());
+			ps.setLong(1, story.getId());
+			ps.setLong(2, story.getReporter().getId());
+			ps.setLong(3, story.getSprint().getId());
+			ps.setLong(4, story.getBacklog().getId());
+			ps.setLong(5, story.getAssignedTeam().getId());
+			ps.setLong(6, story.getAssignedUser().getId());
+			ps.setString(7, story.getTitle());
+			ps.setString(8, story.getDescription());
+			ps.setString(9, story.getType());
+			ps.setString(10, story.getStatus());
+			ps.setString(11, story.getPriority());
+			ps.setString(12, story.getWorkflow());
+			ps.setTimestamp(13, story.getCreationDate());
+			ps.setTimestamp(14, story.getUpdateDate());
+			ps.setInt(15, story.getStoryPoints());
+			ps.setInt(16, story.getBusinessValue());
+			ps.setString(17, story.getAppliVersion());
+			ps.setTimestamp(18, story.getStartDate());
+			ps.setTimestamp(19, story.getEndDate());
+			ps.setTimestamp(20, story.getEstimatedEndDate());
 			return ps;
-		}, keyHolder);
-		story.setId((long) keyHolder.getKey());
+		});
 		return story;
 	}
 

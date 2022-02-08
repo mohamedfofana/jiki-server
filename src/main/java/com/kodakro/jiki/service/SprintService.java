@@ -15,15 +15,22 @@ public class SprintService {
 	@Autowired
 	SprintRepository sprintRepository;
 
-	public List<Sprint> getSprints(){
+	public List<Sprint> findAll(){
 		return sprintRepository.findAll();
 	}
 
-	public Sprint postSprint(Sprint sprint){
+	public List<Sprint> findByProjectId(Long id){
+		return sprintRepository.findByProjectId(id);
+	}
+	
+	public Optional<Sprint> findCurrentByProjectId(Long id){
+		return sprintRepository.findCurrentByProjectId(id);
+	}
+	public Sprint create(Sprint sprint){
 		return sprintRepository.create(sprint);
 	}
 
-	public Sprint getSprintById(Long id){
+	public Sprint findById(Long id){
 		Optional<Sprint> sprint= sprintRepository.findById(id);
 		if (sprint.isPresent())
 			return sprint.get();
@@ -31,36 +38,27 @@ public class SprintService {
 			return null;
 	}
 
-	public void deleteSprintById(Long id){
-		sprintRepository.deleteById(id);
+	public boolean deleteById(Long id){
+		return sprintRepository.deleteById(id);
 	}
 
-	public void patchSprint(Long id, Sprint sprint) {
-		Sprint dbSprint= sprintRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Sprint", "id", id));
+	public Sprint update(Sprint sprint) {
+		Sprint dbSprint= sprintRepository.exists(sprint.getId()).orElseThrow(() -> new ResourceNotFoundException("Sprint", "id", sprint.getId()));
 		if (dbSprint!=null) {
-			if (sprint.getDescription() != null)
-				dbSprint.setDescription(sprint.getDescription());
-			if (sprint.getReporter() != null)
-				dbSprint.setReporter(sprint.getReporter());
 			if (sprint.getTitle() != null)
 				dbSprint.setTitle(sprint.getTitle());
+			if (sprint.getDescription() != null)
+				dbSprint.setDescription(sprint.getDescription());
 			if (sprint.getStatus() != null)
 				dbSprint.setStatus(sprint.getStatus());
-			if (sprint.getWorkflow() != null)
-				dbSprint.setWorkflow(sprint.getWorkflow());
+			if (sprint.getBusinessValue() != null)
+				dbSprint.setBusinessValue(sprint.getBusinessValue());
+			if (sprint.getUpdateDate() != null)
+				dbSprint.setUpdateDate(sprint.getUpdateDate());
 			sprintRepository.update(dbSprint);
+			return dbSprint;
 		}
+		return null;
 	}
 
-	public void updateSrint(Long id, Sprint sprint){
-		Sprint dbSprint =  sprintRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Sprint", "id", id));
-		if (dbSprint!=null) {
-			dbSprint.setDescription(sprint.getDescription());
-			dbSprint.setReporter(sprint.getReporter());
-			dbSprint.setTitle(sprint.getTitle());
-			dbSprint.setStatus(sprint.getStatus());
-			dbSprint.setWorkflow(sprint.getWorkflow());
-			sprintRepository.update(dbSprint);
-		}
-	}
 }

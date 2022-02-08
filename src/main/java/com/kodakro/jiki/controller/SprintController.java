@@ -6,11 +6,11 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,38 +18,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kodakro.jiki.exception.ResourceNotFoundException;
+import com.kodakro.jiki.exception.CustomResponseType;
 import com.kodakro.jiki.model.Sprint;
-import com.kodakro.jiki.repository.SprintRepository;
+import com.kodakro.jiki.service.SprintService;
 
 @RestController
 @RequestMapping(path = "/api/sprint", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SprintController {
 	@Autowired
-	SprintRepository sprintRepository;
+	SprintService sprintService;
 
 	@GetMapping("/all")
-	public List<Sprint> getSprints(){
-		return sprintRepository.findAll();
+	public List<Sprint> findAll(){
+		return sprintService.findAll();
 	}
 
-	@PostMapping("/")
-	public Sprint postSprint(@Valid @RequestBody Sprint sprint){
-		return sprintRepository.create(sprint);
+	@PostMapping("/create")
+	public ResponseEntity<?> create(@Valid @RequestBody Sprint sprint){
+		final Sprint dbSprint = sprintService.create(sprint);
+		if (dbSprint == null) {
+			return new ResponseEntity<CustomResponseType<Sprint>>(new CustomResponseType<Sprint>("KO", null, "Sprint  "+ sprint.getTitle() + " already exists !"), HttpStatus.CONFLICT);
+		}
+		return new ResponseEntity<CustomResponseType<Sprint>>(new CustomResponseType<Sprint>("OK", dbSprint, "Sprint created"), HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
-	public Sprint getSprintById(@PathVariable("id") Long id){
-		Optional<Sprint> sprint= sprintRepository.findById(id);
-		if (sprint.isPresent())
-			return sprint.get();
-		else
-			return null;
+	public Sprint findById(@PathVariable("id") Long id){
+		return sprintService.findById(id);
 	}
 
 	@GetMapping("/current/project/{id}")
 	public Sprint getCurrentSprintByProjectId(@PathVariable("id") Long id){
-		Optional<Sprint> sprint= sprintRepository.findCurrentByProjectId(id);
+		Optional<Sprint> sprint= sprintService.findCurrentByProjectId(id);
 		if (sprint.isPresent())
 			return sprint.get();
 		else
@@ -58,45 +58,25 @@ public class SprintController {
 	}
 	@GetMapping("/project/{id}")
 	public List<Sprint> findByProjectId(@PathVariable("id") Long id){
-		return sprintRepository.findByProjectId(id);
+		return sprintService.findByProjectId(id);
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?>  deleteById(@PathVariable("id") Long id){
-		sprintRepository.deleteById(id);
-		return ResponseEntity.ok().build();
+		final boolean status = sprintService.deleteById(id);
+		if(status) {
+			return new ResponseEntity<CustomResponseType<Sprint>>(new CustomResponseType<Sprint>("OK", null, "Sprint deleted"), HttpStatus.OK);
+		}
+		return  new ResponseEntity<CustomResponseType<Sprint>>(new CustomResponseType<Sprint>("KO", null, "Unable to delete sprint with id = "+ id + "."), HttpStatus.CONFLICT);
 	}
 
-	@PatchMapping("/{id}")
-	public ResponseEntity<?> patchSprint(@PathVariable("id") Long id, @Valid @RequestBody Sprint sprint) {
-		Sprint dbSprint= sprintRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Sprint", "id", id));
-		if (dbSprint!=null) {
-			if (sprint.getDescription() != null)
-				dbSprint.setDescription(sprint.getDescription());
-			if (sprint.getReporter() != null)
-				dbSprint.setReporter(sprint.getReporter());
-			if (sprint.getTitle() != null)
-				dbSprint.setTitle(sprint.getTitle());
-			if (sprint.getStatus() != null)
-				dbSprint.setStatus(sprint.getStatus());
-			if (sprint.getWorkflow() != null)
-				dbSprint.setWorkflow(sprint.getWorkflow());
-			sprintRepository.update(dbSprint);
+	@PutMapping("/update")
+	public ResponseEntity<?> update(@Valid @RequestBody Sprint sprint) {
+		final Sprint dbSprint = sprintService.update(sprint);
+		if (dbSprint == null) {
+			return new ResponseEntity<CustomResponseType<Sprint>>(new CustomResponseType<Sprint>("KO", null, "Unable to uppdate sprint "+ sprint.getTitle() + "."), HttpStatus.CONFLICT);
 		}
-		return ResponseEntity.ok().build();
-	}
+		return new ResponseEntity<CustomResponseType<Sprint>>(new CustomResponseType<Sprint>("OK", dbSprint, "Sprint updated"), HttpStatus.OK);
 
-	@PutMapping("/{id}")
-	public ResponseEntity<?> updateSrint(@PathVariable(value = "id") Long id, @Valid @RequestBody Sprint sprint){
-		Sprint dbSprint =  sprintRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Sprint", "id", id));
-		if (dbSprint!=null) {
-			dbSprint.setDescription(sprint.getDescription());
-			dbSprint.setReporter(sprint.getReporter());
-			dbSprint.setTitle(sprint.getTitle());
-			dbSprint.setStatus(sprint.getStatus());
-			dbSprint.setWorkflow(sprint.getWorkflow());
-			sprintRepository.update(dbSprint);
-		}
-		return ResponseEntity.ok().build();
 	}
 }

@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.kodakro.jiki.model.Project;
+import com.kodakro.jiki.repository.intrf.IGenericRepository;
 import com.kodakro.jiki.repository.mapper.ProjectRowMapper;
 import com.kodakro.jiki.repository.request.AbstractProjectRequest;
 
@@ -19,7 +21,16 @@ import com.kodakro.jiki.repository.request.AbstractProjectRequest;
 public class ProjectRepository extends AbstractProjectRequest implements IGenericRepository<Project> {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-
+	
+	@Value("${sql.project.insert}")
+	private String sqlInsert;
+	
+	@Value("${sql.project.update}")
+	private String sqlUpdate;
+	
+	@Value("${sql.project.delete}")
+	private String sqlDelete;
+	
 	@Override
 	public List<Project> findAll() {
 		return jdbcTemplate.query(getJoinSelect(null), new ProjectRowMapper());
@@ -48,33 +59,29 @@ public class ProjectRepository extends AbstractProjectRequest implements IGeneri
 
 	@Override
 	public boolean deleteById(Long id) {
-		final String sql = "DELETE FROM T_PROJECT WHERE ID=?";
 		Optional<Project> project = exists(id);
 		Object[] teamId = new Object[] {id};
 		if (project.isPresent()) {
-		    return jdbcTemplate.update(sql, teamId)==1;
+		    return jdbcTemplate.update(sqlDelete, teamId)==1;
 		}
 		return false;
 	}
 
 	@Override
 	public boolean update(Project project ) {
-		final String sql = "UPDATE T_PROJECT SET NAME=?, DESCRIPTION=?, STATUS=?, TEAM_ID=?, UPDATE_DATE=? "
-				+ " WHERE ID=?";
-		Object[] param = { project.getName(), project.getDescription(), project.getStatus(), project.getTeam().getId(),LocalDate.now(), 
+		Object[] param = { project.getName(), project.getDescription(), project.getStatus(), project.getTeam().getId(),project.getUpdateDate(), 
 				project.getId()};
-		return jdbcTemplate.update(sql, param)==1;
+		return jdbcTemplate.update(sqlUpdate, param)==1;
 		
 	}
 
 	@Override
 	public Project create(Project project) {
-		final String sql = "INSERT INTO T_PROJECT (ID, NAME, DESCRIPTION, STATUS, TEAM_ID, BACKLOG_ID, CREATION_DATE) VALUES (?,?,?,?,?,?,?)";
 		project.setId(maxId()+1);
 
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection
-					.prepareStatement(sql);
+					.prepareStatement(sqlInsert);
 			ps.setLong(1, project.getId());
 			ps.setString(2, project.getName());
 			ps.setString(3, project.getDescription());

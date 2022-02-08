@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.kodakro.jiki.model.Team;
+import com.kodakro.jiki.repository.intrf.IGenericRepository;
 import com.kodakro.jiki.repository.mapper.TeamRowMapper;
 import com.kodakro.jiki.repository.request.AbstractTeamRequest;
 
@@ -18,7 +20,16 @@ import com.kodakro.jiki.repository.request.AbstractTeamRequest;
 public class TeamRepository extends AbstractTeamRequest implements IGenericRepository<Team> {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-	private final static String TABLE = "T_TEAM";
+	
+	@Value("${sql.team.insert}")
+	private String sqlInsert;
+	
+	@Value("${sql.team.update}")
+	private String sqlUpdate;
+	
+	@Value("${sql.team.delete}")
+	private String sqlDelete;
+	
 	@Override
 	public List<Team> findAll() {
 		return jdbcTemplate.query(getJoinSelect(null), new TeamRowMapper());
@@ -46,31 +57,27 @@ public class TeamRepository extends AbstractTeamRequest implements IGenericRepos
 
 	@Override
 	public boolean deleteById(Long id) {
-		final String sql = "DELETE FROM T_TEAM WHERE ID=?";
 		Optional<Team> team = exists(id);
 		Object[] teamId = new Object[] {id};
 		if (team.isPresent()) {
-			return jdbcTemplate.update(sql, teamId)==1;
+			return jdbcTemplate.update(sqlDelete, teamId)==1;
 		}
 		return false;
 	}
 
 	@Override
 	public boolean update(Team team) {
-		final String sql = "UPDATE "+TABLE+" SET NAME=?, STATUS=?, UPDATE_DATE=?"
-				+ " WHERE ID=?";
 		Object[] param = { team.getName(), team.getStatus(), team.getUpdateDate(), team.getId()};
-		return jdbcTemplate.update(sql, param) == 1;
+		return jdbcTemplate.update(sqlUpdate, param) == 1;
 	}
 
 	@Override
 	public Team create(Team team) {
-		final String sql = "INSERT INTO "+TABLE+" (ID,NAME, STATUS, CREATION_DATE) VALUES (?,?,?,?)";
 		team.setId(maxId()+1);
 
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection
-					.prepareStatement(sql);
+					.prepareStatement(sqlInsert);
 			ps.setLong(1, team.getId());
 			ps.setString(2, team.getName());
 			ps.setString(3, team.getStatus());

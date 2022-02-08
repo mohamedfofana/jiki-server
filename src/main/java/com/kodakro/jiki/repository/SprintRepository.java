@@ -6,13 +6,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.kodakro.jiki.model.Sprint;
+import com.kodakro.jiki.repository.intrf.IGenericRepository;
+import com.kodakro.jiki.repository.intrf.ISprintRepository;
 import com.kodakro.jiki.repository.mapper.SprintRowMapper;
 import com.kodakro.jiki.repository.request.AbstractSprintRequest;
 
@@ -20,7 +21,16 @@ import com.kodakro.jiki.repository.request.AbstractSprintRequest;
 public class SprintRepository extends AbstractSprintRequest implements IGenericRepository<Sprint>, ISprintRepository {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-
+	
+	@Value("${sql.sprint.insert}")
+	private String sqlInsert;
+	
+	@Value("${sql.sprint.update}")
+	private String sqlUpdate;
+	
+	@Value("${sql.sprint.delete}")
+	private String sqlDelete;
+	
 	@Override
 	public List<Sprint> findAll() {
 		return jdbcTemplate.query(getJoinSelect(null), new SprintRowMapper());
@@ -75,8 +85,8 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 	
 	@Override
 	public boolean deleteById(Long id) {
-		final String sql = "DELETE * FROM "+ TABLE +" WHERE SP.ID=?";
-		Optional<Sprint> sprint = findById(id);
+		final String sql = "DELETE * FROM T_SPRINT WHERE SP.ID=?";
+		Optional<Sprint> sprint = exists(id);
 		Object[] param = {id};
 		int[] types = {Types.BIGINT};
 		if (sprint.isPresent())
@@ -86,47 +96,45 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 
 	@Override
 	public boolean update(Sprint sprint) {
-		final String sql = "UPDATE SPRINT SET TITLE='?', DESCRIPTION='?', STATUS='?', WORKFLOW='?', CREATION_DATE=?, UPDATE_DATE=?, "
-				+ " STORY_POINTS=?, BUSINESS_VALUE=?, APPLI_VERSION='?', START_DATE=?, END_DATE=?, ESTIMATED_END_DATE=? "
-				+ " WHERE ID=?";
-		Object[] param = { sprint.getTitle(), sprint.getDescription(), sprint.getStatus(), sprint.getCreationDate(), sprint.getUpdateDate(),
-				sprint.getStoryPoints(), sprint.getBusinessValue(), sprint.getAppliVersion(), sprint.getStartDate(), sprint.getEndDate(),
-				sprint.getEstimatedEndDate(),  sprint.getId()};
-		return jdbcTemplate.update(sql, param)==1;
+		Object[] param = { sprint.getTitle(), sprint.getDescription(), sprint.getStatus(), sprint.getUpdateDate(),
+				sprint.getBusinessValue(), sprint.getEndDate(),
+				sprint.getId()};
+		return jdbcTemplate.update(sqlUpdate, param)==1;
 	}
 
 	@Override
 	public Sprint create(Sprint sprint) {
-		final String sql = "INSERT INTO SPRINT(REPORTER_ID, PROJECT_ID, TITLE, DESCRIPTION, STATUS, WORKFLOW, "
-				+ "CREATION_DATE, UPDATE_DATE, STORY_POINTS, BUSINESS_VALUE, APPLI_VERSION, START_DATE, "
-				+ "END_DATE, ESTIMATED_END_DATE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-		KeyHolder keyHolder = new GeneratedKeyHolder();
+		sprint.setId(maxId()+1);
 
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection
-					.prepareStatement(sql);
-			ps.setLong(1, sprint.getReporter().getId());
-			ps.setLong(2, sprint.getProject().getId());
-			ps.setString(3, sprint.getTitle());
-			ps.setString(4, sprint.getDescription());
-			ps.setString(5, sprint.getStatus());
-			ps.setTimestamp(6, sprint.getCreationDate());
-			ps.setInt(7, sprint.getStoryPoints());
+					.prepareStatement(sqlInsert);
+			ps.setLong(1, sprint.getId());
+			ps.setLong(2, sprint.getReporter().getId());
+			ps.setLong(3, sprint.getProject().getId());
+			ps.setString(4, sprint.getTitle());
+			ps.setString(5, sprint.getDescription());
+			ps.setString(6, sprint.getStatus());
+			ps.setTimestamp(7, sprint.getCreationDate());
 			ps.setInt(8, sprint.getBusinessValue());
-			ps.setString(9, sprint.getAppliVersion());
-			ps.setTimestamp(10, sprint.getStartDate());
-			ps.setTimestamp(11, sprint.getEndDate());
-			ps.setTimestamp(12, sprint.getEstimatedEndDate());
 			return ps;
-		}, keyHolder);
-		sprint.setId((long) keyHolder.getKey());
+		});
 		return sprint;
 	}
 
 	@Override
 	public Optional<Sprint> exists(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		final String whereSql= " WHERE SP.ID =? ";
+		Object[] param = {id};
+		int[] types = {Types.INTEGER};
+		Sprint sprint = null;
+		try {
+			sprint = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
+					new SprintRowMapper());
+		}catch (EmptyResultDataAccessException e) {
+			// log no entity found
+		}
+		return Optional.ofNullable(sprint);
 	}
 
 

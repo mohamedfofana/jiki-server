@@ -17,30 +17,16 @@ public class Sprint  implements Serializable{
 	
 	private Project project;
 	
-	private Backlog backlog;
-	
 	private String title;
 	
 	private String description;
 	
-	private String workflow;
-
 	private String status;
-	
-	private String appliVersion;
 	
 	private Integer businessValue;
 	
-	private Integer storyPoints;
-	
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private Timestamp startDate;
-	
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Timestamp endDate;
-	
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private Timestamp estimatedEndDate;
 	
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Timestamp creationDate;

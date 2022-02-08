@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Repository;
 import com.kodakro.jiki.enums.RoleEnum;
 import com.kodakro.jiki.enums.StatusEnum;
 import com.kodakro.jiki.model.User;
+import com.kodakro.jiki.repository.intrf.IGenericRepository;
+import com.kodakro.jiki.repository.intrf.IUserRepository;
 import com.kodakro.jiki.repository.mapper.UserRowMapper;
 import com.kodakro.jiki.repository.request.AbstractUserRequest;
 
@@ -22,7 +25,16 @@ import com.kodakro.jiki.repository.request.AbstractUserRequest;
 public class UserRepository extends AbstractUserRequest implements IGenericRepository<User>, IUserRepository {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-
+	
+	@Value("${sql.user.insert}")
+	private String sqlInsert;
+	
+	@Value("${sql.user.update}")
+	private String sqlUpdate;
+	
+	@Value("${sql.user.delete}")
+	private String sqlDelete;
+	
 	@Override
 	public List<User> findAll() {
 		return jdbcTemplate.query(getJoinSelect(null), new UserRowMapper());
