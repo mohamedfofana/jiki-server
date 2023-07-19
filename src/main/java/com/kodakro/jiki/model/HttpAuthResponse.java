@@ -1,6 +1,7 @@
 package com.kodakro.jiki.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,10 +15,12 @@ public class HttpAuthResponse implements Serializable{
 	private final boolean status;
 	private final String token;
 	private final User user;
-	public HttpAuthResponse(boolean status, String token, User user) {
+	private final Date expiration; 
+	public HttpAuthResponse(boolean status, String token, User user, Date expiration) {
 		this.status = status;
 		this.token = token;
 		this.user = user;
+		this.expiration = expiration;
 	}
 	
 	@Override

@@ -59,10 +59,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             FilterChain chain,
                                             Authentication auth) throws IOException, ServletException {
     	User user = (User) auth.getPrincipal();
-
-    	 String token = Jwts.builder()
-                 .setSubject((user).getUsername())
-                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+        final Date expirationDate = new Date(System.currentTimeMillis() + EXPIRATION_TIME);
+    	String token = Jwts.builder()
+                 .setSubject((user).getUsername()+ '-'+(user).getEmail())
+                 .setExpiration(expirationDate)
                  .signWith(SignatureAlgorithm.HS512, SECRET)
                  .compact();
     	 
@@ -70,7 +70,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
          
     	 response.setContentType("application/json");
     	 response.setCharacterEncoding("UTF-8");
-    	 response.getWriter().write(new HttpAuthResponse(true, token, user).toString());
+    	 response.getWriter().write(new HttpAuthResponse(true, token, user, expirationDate).toString());
     }
     
     @Override
@@ -79,7 +79,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     	response.setStatus(HttpServletResponse.SC_OK);
     	response.setContentType("application/json");
     	response.setCharacterEncoding("UTF-8");
-    	response.getWriter().write(new HttpAuthResponse(false, "", null).toString());
+    	response.getWriter().write(new HttpAuthResponse(false, "", null, null).toString());
     }
     
     
