@@ -2,7 +2,6 @@ package com.kodakro.jiki.repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Types;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,7 +13,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.kodakro.jiki.enums.RoleEnum;
-import com.kodakro.jiki.enums.StatusEnum;
+import com.kodakro.jiki.enums.UserStatusEnum;
+import com.kodakro.jiki.helpers.TimeHelper;
 import com.kodakro.jiki.model.User;
 import com.kodakro.jiki.repository.intrf.IGenericRepository;
 import com.kodakro.jiki.repository.intrf.IUserRepository;
@@ -50,6 +50,17 @@ public class UserRepository extends AbstractUserRequest implements IGenericRepos
 
 		return Optional.ofNullable(user);
 	}
+	
+	@Override
+	public List<User> findByTeam(Long id) {
+		final String whereSql= " WHERE US.TEAM_ID =? ";
+		Object[] param = {id};
+		int[] types = {Types.INTEGER};
+		List<User> users = jdbcTemplate.query(getNoJointSelect(whereSql), param, types,
+				new UserRowMapper());
+		
+		return users;
+	}
 
 	public Long maxId() {
 		final Long maxId = jdbcTemplate.queryForObject(getMaxId(), null, null, Long.class );
@@ -73,41 +84,46 @@ public class UserRepository extends AbstractUserRequest implements IGenericRepos
 	
 	@Override
 	public boolean deleteById(Long id) {
-		final String sql = "DELETE FROM T_USER WHERE ID=?";
 		Optional<User> user = exists(id);
 		 Object[] userId = new Object[] {id};
 		if (user.isPresent()) {
-			return jdbcTemplate.update(sql, userId)==1;
+			return jdbcTemplate.update(sqlDelete, userId)==1;
 		}
 		return false;
 	}
 
 	@Override
 	public boolean update(User user) {
-		final String sql = "UPDATE T_USER SET FIRSTNAME=?, LASTNAME=?, USERNAME=?, EMAIL=?, ROLE=?, STATUS=?, TEAM_ID=?, PROJECT_ID=?, UPDATE_DATE=?"
-				+ " WHERE ID=?";
-		Object[] param = { user.getFirstname(), user.getLastname(), user.getUsername(), user.getEmail(), user.getRole(), user.getStatus(), user.getTeam().getId(), user.getProject().getId(), LocalDate.now(), user.getId()};
-		return jdbcTemplate.update(sql, param)==1;
+		Object[] param = { user.getFirstname(), 
+				user.getLastname(), 
+				user.getUsername(), user.getEmail(), 
+				user.getRole(), 
+				user.getSubrole(), 
+				user.getStatus(), 
+				user.getTeam().getId(),
+				TimeHelper.timestampNow(),
+				user.getId()};
+		return jdbcTemplate.update(sqlUpdate, param)==1;
 	}
 
 	@Override
 	public User create(User user) {
-		final String sql = "INSERT INTO T_USER (ID, TEAM_ID, PROJECT_ID,FIRSTNAME, LASTNAME, USERNAME, EMAIL, PASSWORD, ROLE, STATUS, CREATION_DATE) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 		user.setId(maxId()+1);
+		user.setStatus(UserStatusEnum.ACTIVE.toString());
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection
-					.prepareStatement(sql);
+					.prepareStatement(sqlInsert);
 			ps.setLong(1, user.getId());
 			ps.setLong(2, user.getTeam().getId());
-			ps.setLong(3, user.getProject().getId());
-			ps.setString(4, user.getFirstname());
-			ps.setString(5, user.getLastname());
-			ps.setString(6, user.getUsername());
-			ps.setString(7, user.getEmail());
-			ps.setString(8, user.getPassword());
-			ps.setString(9, user.getRole()==null? RoleEnum.USER.toString():user.getRole());
-			ps.setString(10, user.getStatus()==null? StatusEnum.ACTIVE.toString():user.getStatus());
-			ps.setTimestamp(11, user.getCreationDate());
+			ps.setString(3, user.getFirstname());
+			ps.setString(4, user.getLastname());
+			ps.setString(5, user.getUsername());
+			ps.setString(6, user.getEmail());
+			ps.setString(7, user.getPassword());
+			ps.setString(8, user.getRole());
+			ps.setString(9, user.getSubrole()!=null? user.getRole():RoleEnum.USER.toString());
+			ps.setString(10, user.getStatus());
+			ps.setTimestamp(11, TimeHelper.timestampNow());
 			return ps;
 		});
 		return user;
@@ -120,7 +136,7 @@ public class UserRepository extends AbstractUserRequest implements IGenericRepos
 		int[] types = {Types.INTEGER};
 		User user = null;
 		try {
-			user = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
+			user = jdbcTemplate.queryForObject(getNoJointSelect(whereSql), param, types,
 					new UserRowMapper());
 		}catch (EmptyResultDataAccessException e) {
 			// log no user found

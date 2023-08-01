@@ -15,12 +15,10 @@ public class HttpAuthResponse implements Serializable{
 	private final boolean status;
 	private final String token;
 	private final User user;
-	private final Date expiration; 
-	public HttpAuthResponse(boolean status, String token, User user, Date expiration) {
+	public HttpAuthResponse(boolean status, String token, User user) {
 		this.status = status;
 		this.token = token;
 		this.user = user;
-		this.expiration = expiration;
 	}
 	
 	@Override

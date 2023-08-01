@@ -23,7 +23,7 @@ public class User implements UserDetails{
 
 	private Team team;
 	
-	private Project project;
+	//private Project project;
 
 	private String username;
 
@@ -36,6 +36,8 @@ public class User implements UserDetails{
 	private String password;
 
 	private String role;
+
+	private String subrole;
 
 	private String status;
 

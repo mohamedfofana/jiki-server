@@ -56,6 +56,22 @@ public class SprintController {
 			return null;
 
 	}
+
+	@GetMapping("/running/project/{id}")
+	public Sprint getRunningSprintByProjectId(@PathVariable("id") Long id){
+		Optional<Sprint> sprint= sprintService.findRunningByProjectId(id);
+		if (sprint.isPresent())
+			return sprint.get();
+		else
+			return null;
+		
+	}
+
+	@GetMapping("/project/{id}/status/{status}")
+	public List<Sprint> findByStatusInProject(@PathVariable("id") Long id, @PathVariable("status") String status){
+		return sprintService.findByStatusInProject(id, status);
+	}
+	
 	@GetMapping("/project/{id}")
 	public List<Sprint> findByProjectId(@PathVariable("id") Long id){
 		return sprintService.findByProjectId(id);
@@ -70,13 +86,23 @@ public class SprintController {
 		return  new ResponseEntity<CustomResponseType<Sprint>>(new CustomResponseType<Sprint>("KO", null, "Unable to delete sprint with id = "+ id + "."), HttpStatus.CONFLICT);
 	}
 
-	@PutMapping("/update")
-	public ResponseEntity<?> update(@Valid @RequestBody Sprint sprint) {
-		final Sprint dbSprint = sprintService.update(sprint);
+	@PutMapping("/start")
+	public ResponseEntity<?> start(@Valid @RequestBody Sprint sprint) {
+		final Sprint dbSprint = sprintService.start(sprint);
 		if (dbSprint == null) {
 			return new ResponseEntity<CustomResponseType<Sprint>>(new CustomResponseType<Sprint>("KO", null, "Unable to uppdate sprint "+ sprint.getTitle() + "."), HttpStatus.CONFLICT);
 		}
 		return new ResponseEntity<CustomResponseType<Sprint>>(new CustomResponseType<Sprint>("OK", dbSprint, "Sprint updated"), HttpStatus.OK);
 
+	}
+
+	@PutMapping("/close")
+	public ResponseEntity<?> close(@Valid @RequestBody Sprint sprint) {
+		final Sprint dbSprint = sprintService.close(sprint);
+		if (dbSprint == null) {
+			return new ResponseEntity<CustomResponseType<Sprint>>(new CustomResponseType<Sprint>("KO", null, "Unable to uppdate sprint "+ sprint.getTitle() + "."), HttpStatus.CONFLICT);
+		}
+		return new ResponseEntity<CustomResponseType<Sprint>>(new CustomResponseType<Sprint>("OK", dbSprint, "Sprint updated"), HttpStatus.OK);
+		
 	}
 }

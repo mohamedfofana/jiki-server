@@ -13,9 +13,11 @@ public class TeamRowMapper implements RowMapper<Team>{
 		Team team = new Team();
 		team.setId(rs.getLong("ID_TE"));
 		team.setName(rs.getString("NAME_TE"));
+		team.setDescription(rs.getString("DESCRIPTION_TE"));
 		team.setStatus(rs.getString("STATUS_TE"));
 		team.setCreationDate(rs.getTimestamp("CREATION_DATE_TE"));
 		team.setUpdateDate(rs.getTimestamp("UPDATE_DATE_TE"));
+		
 		return team;
 	}
 	
@@ -23,6 +25,7 @@ public class TeamRowMapper implements RowMapper<Team>{
 		Team team = new Team();
 		team.setId(rs.getLong("ID_TE_ASS"));
 		team.setName(rs.getString("NAME_TE_ASS"));
+		
 		return team;
 	}
 	
@@ -30,6 +33,7 @@ public class TeamRowMapper implements RowMapper<Team>{
 		Team team = new Team();
 		team.setId(rs.getLong("ID_TE_PR_ASS"));
 		team.setName(rs.getString("NAME_TE_PR_ASS"));
+		
 		return team;
 	}
 }

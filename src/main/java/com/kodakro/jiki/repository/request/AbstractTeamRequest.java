@@ -7,6 +7,7 @@ public abstract class AbstractTeamRequest {
 	public static final String COLUMNS_SQL = " "
 		+ "TE.ID AS ID_TE," 
 		+ "TE.NAME AS NAME_TE," 
+		+ "TE.DESCRIPTION AS DESCRIPTION_TE," 
 		+ "TE.STATUS AS STATUS_TE,"
 		+ "TE.CREATION_DATE AS CREATION_DATE_TE,"
 		+ "TE.UPDATE_DATE AS UPDATE_DATE_TE \n";
@@ -23,6 +24,7 @@ public abstract class AbstractTeamRequest {
 			+ "TE_PR_ASS.CREATION_DATE AS CREATION_DATE_TE_PR_ASS,"
 			+ "TE_PR_ASS.UPDATE_DATE AS UPDATE_DATE_TE_PR_ASS \n";
 	protected final String FROM_SQL="FROM "+TABLE;
+	protected static final String LEFT_JOIN_PROJECT = " LEFT JOIN T_PROJECT PR ON PR.TEAM_ID=TE.ID";
 	
 	protected String getMaxId() {
 		StringBuilder sb = new StringBuilder(SELECT_MAX_ID);
@@ -41,6 +43,13 @@ public abstract class AbstractTeamRequest {
 		return sb.toString();
 	}
 	
+	protected String getSelect() {
+		StringBuilder sb = new StringBuilder(SELECT_SQL);		
+		sb.append(COLUMNS_SQL);
+		sb.append(FROM_SQL);	
+		return sb.toString();
+	}
+
 	protected String getJoinSelect(String whereSql) {
 		StringBuilder sb = new StringBuilder(SELECT_SQL);		
 		sb.append(COLUMNS_SQL);

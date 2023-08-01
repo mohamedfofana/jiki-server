@@ -1,7 +1,10 @@
 package com.kodakro.jiki.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,18 +46,13 @@ public class StoryService {
 			return null;
 	}
 
-//	public List<Story> getStoriesByReporterId(Long id){
-//		List<Story> stories= storyRepository.findByReporterId(id);		
-//		return stories;
-//	}
-	
-//	public List<Story> getStoriesByProjectId(Long id){
-//		List<Story> stories= storyRepository.findByProjectId(id);		
-//		return stories;
-//	}
-
 	public List<Story> getStoriesOnBacklogsByProjectId(Long id){
 		List<Story> stories= storyRepository.findStoriesOnBacklogsByProjectId(id);		
+		return stories;
+	}
+
+	public List<Story> findByProject(Long id){
+		List<Story> stories= storyRepository.findByProject(id);		
 		return stories;
 	}
 	
@@ -62,11 +60,6 @@ public class StoryService {
 		List<Story> stories= storyRepository.findByProjectIdAndSprintId(projectId, sprintId);		
 		return stories;
 	}
-	
-//	public List<Story> getByProjectIdAndCurrentSprint(Long id){
-//		List<Story> stories= storyRepository.findByProjectIdAndCurrentSprint(id);		
-//		return stories;
-//	}
 	
 	public List<Story> getStoriesBySprintId(Long id){
 		List<Story> stories= storyRepository.findBySprintId(id);		
@@ -77,41 +70,18 @@ public class StoryService {
 		storyRepository.deleteById(id);
 	}
 
-	public void patchStory(Long id, Story story) {
-		Story dbStory= storyRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Story", "id", id));
-		if (dbStory!=null) {
-			if (story.getAssignedUser() != null)
-				dbStory.setAssignedUser(story.getAssignedUser());
-			if (story.getAssignedTeam() != null)
-				dbStory.setAssignedTeam(story.getAssignedTeam());
-			if (story.getBusinessValue() != null)
-				dbStory.setBusinessValue(story.getBusinessValue());
-			if (story.getDescription() != null)
-				dbStory.setDescription(story.getDescription());
-			if (story.getStartDate() != null)
-				dbStory.setStartDate(story.getStartDate());
-			if (story.getEndDate() != null)
-				dbStory.setEndDate(story.getEndDate());
-			if (story.getEstimatedEndDate() != null)
-				dbStory.setEstimatedEndDate(story.getEstimatedEndDate());
-			if (story.getPriority() != null)
-				dbStory.setPriority(story.getPriority());
-			if (story.getTitle() != null)
-				dbStory.setTitle(story.getTitle());
-			if (story.getType() != null)
-				dbStory.setType(story.getType());
-			if (story.getBacklog() != null)
-				dbStory.setBacklog(story.getBacklog());
-			if (story.getStatus() != null)
-				dbStory.setStatus(story.getStatus());
-			if (story.getStoryPoints() != null)
-				dbStory.setStoryPoints(story.getStoryPoints());
-			if (story.getReporter() != null)
-				dbStory.setReporter(story.getReporter());
-			if (story.getSprint() != null)
-				dbStory.setSprint(story.getSprint());
-			storyRepository.update(dbStory);
-		}
+	public void patchStory(Long id, @Valid Map<String, Object> fieldValueMap) {
+		//Story dbStory= storyRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Story", "id", id));
+//		if (dbStory!=null) {
+			if(!fieldValueMap.isEmpty()) {
+//				fieldValueMap.forEach((key, value) -> {
+//					Field field = ReflectionUtils.findField(Story.class, key);
+//					field.setAccessible(true);
+//					ReflectionUtils.setField(field, dbStory, value);
+//				});
+				storyRepository.updateField(id, fieldValueMap);
+			}
+//		}
 	}
 
 	public void updateStory(Long id, Story story){
@@ -172,5 +142,21 @@ public class StoryService {
 			}
 			storyRepository.updateSprintAndBacklog(dbStory);
 		}
+	}
+	
+	public Story create(Story story) {
+		Optional<Story> dbStory = storyRepository.exists(story.getId());
+		if (dbStory.isPresent()) {
+			return null;
+		}
+		return storyRepository.create(story);
+	}
+
+	public void moveToBacklog(Long backlogId, List<Story> stories) {
+		storyRepository.moveToBacklog(backlogId, stories);
+	}
+	
+	public void moveToSprint(Long backlogId, List<Story> stories) {
+		storyRepository.moveToSprint(backlogId, stories);
 	}
 }

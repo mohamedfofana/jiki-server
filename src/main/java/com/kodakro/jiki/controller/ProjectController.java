@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kodakro.jiki.exception.CustomResponseType;
 import com.kodakro.jiki.model.Project;
+import com.kodakro.jiki.model.Sprint;
 import com.kodakro.jiki.service.ProjectService;
 
 @RestController
@@ -32,6 +33,11 @@ public class ProjectController {
 		return projectService.findAll();
 	}
 
+	@GetMapping("/team/{id}")
+	public Project findByTeam(@PathVariable("id") Long id){
+		return projectService.findByTeam(id);
+	}
+	
 	@PostMapping("/create")
 	public ResponseEntity<?> create(@Valid @RequestBody Project project) {
 		final Project dbProject = projectService.create(project);

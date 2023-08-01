@@ -13,6 +13,8 @@ import lombok.Setter;
 public class Project implements Serializable{
 	private Long id;
 	
+	private String shortname;
+
 	private String name;
 	
 	private String description;

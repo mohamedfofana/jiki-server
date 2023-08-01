@@ -1,6 +1,7 @@
 package com.kodakro.jiki.repository.intrf;
 
 import java.util.List;
+import java.util.Map;
 
 import com.kodakro.jiki.model.Story;
 
@@ -20,11 +21,25 @@ public interface IStoryRepository {
 	 * find all stories by sprint
 	 */
 	List<Story> findBySprintId(Long id);
+
+	/*
+	 * find all stories by sprint
+	 */
+	List<Story> findByProject(Long id);
 	
 	/*
 	 * Update story status
 	 */
-	void updateStatus(Story t) ;
+	void updateStatus(Story t);
+	
+	public void moveToBacklog(Long id, List<Story> stories);
+	
+	public void moveToSprint(Long id, List<Story> stories);
+	
+	/*
+	 * Update story status
+	 */
+	void updateField(Long id, Map<String, Object> fieldValueMap) ;
 	
 	/*
 	 * Update the backlog and sprint of a story

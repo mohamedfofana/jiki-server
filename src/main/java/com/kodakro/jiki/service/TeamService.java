@@ -20,6 +20,10 @@ public class TeamService {
 		return teamRepository.findAll();
 	}
 
+	public List<Team> findAllAvailableForProject(Long projectId){
+		return teamRepository.findAllAvailableForProject(projectId);
+	}
+
 	public Team create(Team team) {
 		Optional<Team> dbTeam = teamRepository.exists(team.getId());
 		if (dbTeam.isPresent()) {

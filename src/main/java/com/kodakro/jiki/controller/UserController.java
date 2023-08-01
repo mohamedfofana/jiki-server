@@ -59,6 +59,11 @@ public class UserController {
 	public User findById(@PathVariable("id") Long id){
 		return userService.findById(id);
 	}
+	
+	@GetMapping("/team/{id}")
+	public List<User> findByTeam(@PathVariable("id") Long id){
+		return userService.findByTeam(id);
+	}
 
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<?> deleteById(@PathVariable("id") Long id){

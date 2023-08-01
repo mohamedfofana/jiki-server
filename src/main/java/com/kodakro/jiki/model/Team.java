@@ -15,6 +15,8 @@ public class Team  implements Serializable{
 	
 	private String name;
 	
+	private String description;
+	
 	private String status;
 	
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

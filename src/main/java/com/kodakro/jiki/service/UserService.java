@@ -45,6 +45,12 @@ public class UserService {
 			return null;
 	}
 	
+	@Cacheable(value="usersCache",key="#id",unless="#result==null")
+	public List<User> findByTeam(Long id){
+		List<User> users= userRepository.findByTeam(id);
+		return users;
+	}
+	
 	@CacheEvict(value="usersCache",key="#id")
 	public boolean deleteById(Long id){
 		return userRepository.deleteById(id);
@@ -71,8 +77,6 @@ public class UserService {
 				
 				if (user.getTeam() != null)
 					dbUser.setTeam(user.getTeam());
-				if (user.getProject() != null)
-					dbUser.setProject(user.getProject());
 
 				userRepository.update(dbUser);
 				return dbUser;

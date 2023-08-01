@@ -25,6 +25,8 @@ public class Story  implements Serializable{
 	
 	private User assignedUser;
 	
+	private String shortTitle;
+
 	private String title;
 	
 	private String description;

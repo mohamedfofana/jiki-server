@@ -14,6 +14,7 @@ public class ProjectRowMapper extends AbstractRowMapper implements RowMapper<Pro
 	public Project mapRow(ResultSet rs, int rowNum) throws SQLException {
 		Project project = new Project();
 		project.setId(rs.getLong("ID_PR"));
+		project.setShortname(rs.getString("SHORTNAME_PR"));
 		project.setName(rs.getString("NAME_PR"));
 		project.setDescription(rs.getString("DESCRIPTION_PR"));
 		project.setStatus(rs.getString("STATUS_PR"));

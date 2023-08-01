@@ -19,11 +19,20 @@ public class Sprint  implements Serializable{
 	
 	private String title;
 	
+	private String name;
+
+	private String goal;
+
+	private String duration;
+	
 	private String description;
 	
 	private String status;
 	
 	private Integer businessValue;
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private Timestamp startDate;
 	
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Timestamp endDate;

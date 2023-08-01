@@ -17,6 +17,7 @@ public class StoryRowMapper extends AbstractRowMapper implements RowMapper<Story
 	public Story mapRow(ResultSet rs, int rowNum) throws SQLException {
 		Story story = new Story();
 		story.setId(rs.getLong("ID_ST"));
+		story.setShortTitle(rs.getString("SHORT_TITLE_ST"));
 		story.setTitle(rs.getString("TITLE_ST"));
 		story.setDescription(rs.getString("DESCRIPTION_ST"));
 		story.setType(rs.getString("TYPE_ST"));

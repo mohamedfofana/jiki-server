@@ -15,8 +15,12 @@ public class SprintRowMapper extends AbstractRowMapper implements RowMapper<Spri
 		Sprint sprint = new Sprint();
 		sprint.setId(rs.getLong("ID_SP"));
 		sprint.setTitle(rs.getString("TITLE_SP"));
+		sprint.setName(rs.getString("NAME_SP"));
+		sprint.setGoal(rs.getString("GOAL_SP"));
+		sprint.setDuration(rs.getString("DURATION_SP"));
 		sprint.setDescription(rs.getString("DESCRIPTION_SP"));
 		sprint.setStatus(rs.getString("STATUS_SP"));
+		sprint.setStartDate(rs.getTimestamp("START_DATE_SP"));
 		sprint.setCreationDate(rs.getTimestamp("CREATION_DATE_SP"));
 		sprint.setUpdateDate(rs.getTimestamp("UPDATE_DATE_SP"));
 		sprint.setBusinessValue(rs.getInt("BUSINESS_VALUE_SP"));

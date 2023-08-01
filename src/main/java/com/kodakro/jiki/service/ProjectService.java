@@ -35,6 +35,10 @@ public class ProjectService {
 	public List<Project> findAll(){
 		return projectRepository.findAll();
 	}
+	
+	public Project findByTeam(Long id){
+		return projectRepository.findByTeam(id);
+	}
 
 	public Project findById(Long id){
 		Optional<Project> project= projectRepository.findById(id);
@@ -58,6 +62,8 @@ public class ProjectService {
 	public Project update(Project project){
 		Project dbProject =  projectRepository.exists(project.getId()).orElseThrow(() -> new ResourceNotFoundException("Project", "id", project.getId()));
 		if (dbProject!=null) {
+			if (project.getShortname() != null)
+				dbProject.setShortname(project.getShortname());
 			if (project.getName() != null)
 				dbProject.setName(project.getName());
 			if (project.getDescription() != null)

@@ -1,5 +1,9 @@
 package com.kodakro.jiki.repository.intrf;
 
-public interface IUserRepository {
+import java.util.List;
 
+import com.kodakro.jiki.model.User;
+
+public interface IUserRepository {
+	List<User> findByTeam(Long id);
 }

@@ -1,6 +1,6 @@
 package com.kodakro.jiki.enums;
 
-public enum StatusEnum {
+public enum UserStatusEnum {
 	ACTIVE,
 	INACTIVE
 }

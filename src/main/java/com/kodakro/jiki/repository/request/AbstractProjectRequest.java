@@ -7,6 +7,7 @@ public abstract class AbstractProjectRequest {
 	public static final String COLUMNS_SQL = " "
 		+ "PR.ID AS ID_PR," 
 		+ "PR.BACKLOG_ID AS BACKLOG_ID_PR," 
+		+ "PR.SHORTNAME AS SHORTNAME_PR," 
 		+ "PR.NAME AS NAME_PR," 
 		+ "PR.DESCRIPTION AS DESCRIPTION_PR,"
 		+ "PR.STATUS AS STATUS_PR,"

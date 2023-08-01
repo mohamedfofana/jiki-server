@@ -70,7 +70,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
          
     	 response.setContentType("application/json");
     	 response.setCharacterEncoding("UTF-8");
-    	 response.getWriter().write(new HttpAuthResponse(true, token, user, expirationDate).toString());
+    	 response.getWriter().write(new HttpAuthResponse(true, token, user).toString());
     }
     
     @Override
@@ -79,7 +79,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     	response.setStatus(HttpServletResponse.SC_OK);
     	response.setContentType("application/json");
     	response.setCharacterEncoding("UTF-8");
-    	response.getWriter().write(new HttpAuthResponse(false, "", null, null).toString());
+    	response.getWriter().write(new HttpAuthResponse(false, "", null).toString());
     }
     
     

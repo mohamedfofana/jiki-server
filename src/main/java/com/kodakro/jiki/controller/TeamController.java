@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kodakro.jiki.exception.CustomResponseType;
+import com.kodakro.jiki.model.Project;
 import com.kodakro.jiki.model.Team;
 import com.kodakro.jiki.service.TeamService;
 
@@ -32,6 +33,11 @@ public class TeamController {
 		return teamService.findAll();
 	}
 
+	@GetMapping("/allAvailableForProject/{id}")
+	public List<Team> findAllAvailableForProject(@PathVariable("id") Long id){
+		return teamService.findAllAvailableForProject(id);
+	}
+	
 	@PostMapping("/create")
 	public ResponseEntity<?> register(@Valid @RequestBody Team team) {
 		final Team dbTeam = teamService.create(team);

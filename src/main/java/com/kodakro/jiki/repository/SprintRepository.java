@@ -11,6 +11,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.kodakro.jiki.enums.SprintStatusEnum;
 import com.kodakro.jiki.model.Sprint;
 import com.kodakro.jiki.repository.intrf.IGenericRepository;
 import com.kodakro.jiki.repository.intrf.ISprintRepository;
@@ -25,8 +26,11 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 	@Value("${sql.sprint.insert}")
 	private String sqlInsert;
 	
-	@Value("${sql.sprint.update}")
-	private String sqlUpdate;
+	@Value("${sql.sprint.start}")
+	private String sqlStart;
+
+	@Value("${sql.sprint.close}")
+	private String sqlClose;
 	
 	@Value("${sql.sprint.delete}")
 	private String sqlDelete;
@@ -59,7 +63,30 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 
 	@Override
 	public Optional<Sprint> findCurrentByProjectId(Long id) {
-		final String whereSql= " AND PR.ID =? AND SP.STATUS='RUNNING'";
+		Sprint sprint = null;
+		Optional<Sprint> runningSprint =  findRunningByProjectId(id);
+		if(runningSprint.isEmpty()) {
+			final String whereSql= " AND PR.ID =? "
+					+ "AND SP.STATUS = '"+ SprintStatusEnum.CREATED + "'";
+			Object[] param = {id};
+			int[] types = {Types.INTEGER};
+			try {
+				sprint = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
+						new SprintRowMapper());			
+			}catch(EmptyResultDataAccessException e) {
+				// log No sprint found
+			}
+		}else {
+			sprint = runningSprint.get();
+		}
+		
+		return Optional.ofNullable(sprint);
+	}
+
+	@Override
+	public Optional<Sprint> findRunningByProjectId(Long id) {
+		final String whereSql= " AND PR.ID =? "
+				+ "AND SP.STATUS IN ('" + SprintStatusEnum.IN_PROGRESS + "')";
 		Object[] param = {id};
 		int[] types = {Types.INTEGER};
 		Sprint sprint = null;
@@ -77,35 +104,54 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 		final String whereSql= " AND PR.ID =?";
 		Object[] param = {id};
 		int[] types = {Types.INTEGER};
-		List<Sprint> sprint = null;
-		sprint = jdbcTemplate.query(getJoinSelect(whereSql), param, types,
+		List<Sprint> sprints = null;
+		sprints = jdbcTemplate.query(getJoinSelect(whereSql), param, types,
 					new SprintRowMapper());			
-		return sprint;
+		return sprints;
 	}
 	
 	@Override
 	public boolean deleteById(Long id) {
-		final String sql = "DELETE * FROM T_SPRINT WHERE SP.ID=?";
 		Optional<Sprint> sprint = exists(id);
 		Object[] param = {id};
 		int[] types = {Types.BIGINT};
 		if (sprint.isPresent())
-			return jdbcTemplate.update(sql, param, types)==1;
+			return jdbcTemplate.update(sqlDelete, param, types)==1;
 		return false;
 	}
 
 	@Override
-	public boolean update(Sprint sprint) {
-		Object[] param = { sprint.getTitle(), sprint.getDescription(), sprint.getStatus(), sprint.getUpdateDate(),
-				sprint.getBusinessValue(), sprint.getEndDate(),
+	public boolean start(Sprint sprint) {
+		Object[] param = { 
+				sprint.getStatus(), 
+				sprint.getName(), 
+				sprint.getGoal(), 
+				sprint.getDuration(), 
+				sprint.getBusinessValue(), 
+				sprint.getStartDate(),
+				sprint.getUpdateDate(),
+				sprint.getEndDate(),
 				sprint.getId()};
-		return jdbcTemplate.update(sqlUpdate, param)==1;
+		return jdbcTemplate.update(sqlStart, param)==1;
+	}
+	
+	@Override
+	public boolean update(Sprint sprint) {
+//		Object[] param = { 
+//				SprintStatusEnum.RUNNING, 
+//				sprint.getBusinessValue(), 
+//				TimeHelper.timestampNow(),
+//				TimeHelper.timestampNow(),
+//				Timestamp.valueOf(LocalDate.now().plusWeeks(3).atStartOfDay()),
+//				sprint.getId()};
+//		return jdbcTemplate.update(sqlUpdate, param)==1;
+		return true;
 	}
 
 	@Override
 	public Sprint create(Sprint sprint) {
 		sprint.setId(maxId()+1);
-
+		sprint.setStatus(SprintStatusEnum.CREATED.toString());
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection
 					.prepareStatement(sqlInsert);
@@ -116,7 +162,6 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 			ps.setString(5, sprint.getDescription());
 			ps.setString(6, sprint.getStatus());
 			ps.setTimestamp(7, sprint.getCreationDate());
-			ps.setInt(8, sprint.getBusinessValue());
 			return ps;
 		});
 		return sprint;
@@ -128,6 +173,7 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 		Object[] param = {id};
 		int[] types = {Types.INTEGER};
 		Sprint sprint = null;
+		
 		try {
 			sprint = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
 					new SprintRowMapper());
@@ -135,6 +181,30 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 			// log no entity found
 		}
 		return Optional.ofNullable(sprint);
+	}
+
+	@Override
+	public List<Sprint> findByStatusInProject(Long id, String status) {
+			final String whereSql= " AND PR.ID =? AND SP.STATUS =? ";
+			Object[] param = {id, status};
+			int[] types = {Types.INTEGER, Types.VARCHAR};
+			
+			List<Sprint> sprints = null;
+			sprints = jdbcTemplate.query(getJoinSelect(whereSql), param, types,
+					new SprintRowMapper());		
+			
+			return sprints;
+	}
+
+	@Override
+	public boolean close(Sprint sprint) {
+		Object[] param = { 
+				sprint.getStatus(), 
+				sprint.getUpdateDate(),
+				sprint.getEndDate(),
+				sprint.getId()};
+		
+		return jdbcTemplate.update(sqlClose, param)==1;
 	}
 
 

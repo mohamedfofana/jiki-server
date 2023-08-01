@@ -22,20 +22,21 @@ public class UserRowMapper extends AbstractRowMapper implements RowMapper<User>{
 		user.setEmail(rs.getString("EMAIL_US"));
 		user.setStatus(rs.getString("STATUS_US"));
 		user.setRole(rs.getString("ROLE_US"));
+		user.setSubrole(rs.getString("SUBROLE_US"));
 		user.setCreationDate(rs.getTimestamp("CREATION_DATE_US"));
 		user.setUpdateDate(rs.getTimestamp("UPDATE_DATE_US"));
 		if (isIdColumn(rs, "ID_TE")) {
 			Team team = new TeamRowMapper().mapRow(rs, rowNum);
 			user.setTeam(team);
 		}
-		if (isIdColumn(rs, "ID_PR_ASS")) {
+		/*if (isIdColumn(rs, "ID_PR_ASS")) {
 			Project project = new ProjectRowMapper().mapRowAssigned(rs, rowNum);
 			user.setProject(project);
 			if (isIdColumn(rs,"ID_BA_ASS")) {
 				Backlog backlog = new BacklogRowMapper().mapRowAssigned(rs, rowNum);
 				project.setBacklog(backlog);
 			}
-		}
+		}*/
 		return user;
 	}
 	
@@ -44,6 +45,7 @@ public class UserRowMapper extends AbstractRowMapper implements RowMapper<User>{
 		user.setUsername(rs.getString("USERNAME_US"));
 		user.setPassword(rs.getString("PASSWORD_US"));
 		user.setRole(rs.getString("ROLE_US"));
+		user.setSubrole(rs.getString("SUBROLE_US"));
 		return user;
 	}
 	
@@ -54,6 +56,7 @@ public class UserRowMapper extends AbstractRowMapper implements RowMapper<User>{
 		user.setLastname(rs.getString("LASTNAME_US_RE"));
 		user.setEmail(rs.getString("EMAIL_US_RE"));
 		user.setRole(rs.getString("ROLE_US_RE"));
+		user.setSubrole(rs.getString("SUBROLE_US_RE"));
 		return user;
 	}
 	public User mapRowAssigned(ResultSet rs, int rowNum) throws SQLException {
@@ -63,6 +66,7 @@ public class UserRowMapper extends AbstractRowMapper implements RowMapper<User>{
 		user.setLastname(rs.getString("LASTNAME_US_ASS"));
 		user.setEmail(rs.getString("EMAIL_US_ASS"));
 		user.setRole(rs.getString("ROLE_US_ASS"));
+		user.setSubrole(rs.getString("SUBROLE_US_ASS"));
 		return user;
 	}
 }
