@@ -70,6 +70,8 @@ public class UserService {
 					dbUser.setEmail(user.getEmail());
 				if (user.getStatus() != null)
 					dbUser.setStatus(user.getStatus());
+				if (user.getJobTitle() != null)
+					dbUser.setJobTitle(user.getJobTitle());
 				if (user.getRole() != null)
 					dbUser.setRole(user.getRole());
 				if (user.getStatus() != null)

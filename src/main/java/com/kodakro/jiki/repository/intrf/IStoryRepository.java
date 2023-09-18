@@ -26,6 +26,8 @@ public interface IStoryRepository {
 	 * find all stories by sprint
 	 */
 	List<Story> findByProject(Long id);
+
+	List<Story> findByReporter(Long id);
 	
 	/*
 	 * Update story status

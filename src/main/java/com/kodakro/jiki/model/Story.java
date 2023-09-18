@@ -34,6 +34,8 @@ public class Story  implements Serializable{
 	private String workflow;
 
 	private String type;
+
+	private String scope;
 	
 	private String priority;
 	

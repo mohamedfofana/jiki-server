@@ -21,8 +21,8 @@ public class UserRowMapper extends AbstractRowMapper implements RowMapper<User>{
 		user.setPassword(rs.getString("PASSWORD_US"));
 		user.setEmail(rs.getString("EMAIL_US"));
 		user.setStatus(rs.getString("STATUS_US"));
+		user.setJobTitle(rs.getString("JOBTITLE_US"));
 		user.setRole(rs.getString("ROLE_US"));
-		user.setSubrole(rs.getString("SUBROLE_US"));
 		user.setCreationDate(rs.getTimestamp("CREATION_DATE_US"));
 		user.setUpdateDate(rs.getTimestamp("UPDATE_DATE_US"));
 		if (isIdColumn(rs, "ID_TE")) {
@@ -44,8 +44,8 @@ public class UserRowMapper extends AbstractRowMapper implements RowMapper<User>{
 		User user = new User();
 		user.setUsername(rs.getString("USERNAME_US"));
 		user.setPassword(rs.getString("PASSWORD_US"));
+		user.setJobTitle(rs.getString("JOBTITLE_US"));
 		user.setRole(rs.getString("ROLE_US"));
-		user.setSubrole(rs.getString("SUBROLE_US"));
 		return user;
 	}
 	
@@ -55,8 +55,8 @@ public class UserRowMapper extends AbstractRowMapper implements RowMapper<User>{
 		user.setFirstname(rs.getString("FIRSTNAME_US_RE"));
 		user.setLastname(rs.getString("LASTNAME_US_RE"));
 		user.setEmail(rs.getString("EMAIL_US_RE"));
+		user.setJobTitle(rs.getString("JOBTITLE_US_RE"));
 		user.setRole(rs.getString("ROLE_US_RE"));
-		user.setSubrole(rs.getString("SUBROLE_US_RE"));
 		return user;
 	}
 	public User mapRowAssigned(ResultSet rs, int rowNum) throws SQLException {
@@ -65,8 +65,8 @@ public class UserRowMapper extends AbstractRowMapper implements RowMapper<User>{
 		user.setFirstname(rs.getString("FIRSTNAME_US_ASS"));
 		user.setLastname(rs.getString("LASTNAME_US_ASS"));
 		user.setEmail(rs.getString("EMAIL_US_ASS"));
+		user.setJobTitle(rs.getString("JOBTITLE_US_ASS"));
 		user.setRole(rs.getString("ROLE_US_ASS"));
-		user.setSubrole(rs.getString("SUBROLE_US_ASS"));
 		return user;
 	}
 }

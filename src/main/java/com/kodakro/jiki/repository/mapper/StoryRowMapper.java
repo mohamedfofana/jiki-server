@@ -21,6 +21,7 @@ public class StoryRowMapper extends AbstractRowMapper implements RowMapper<Story
 		story.setTitle(rs.getString("TITLE_ST"));
 		story.setDescription(rs.getString("DESCRIPTION_ST"));
 		story.setType(rs.getString("TYPE_ST"));
+		story.setScope(rs.getString("SCOPE_ST"));
 		story.setStatus(rs.getString("STATUS_ST"));
 		story.setPriority(rs.getString("PRIORITY_ST"));
 		story.setWorkflow(rs.getString("WORKFLOW_ST"));

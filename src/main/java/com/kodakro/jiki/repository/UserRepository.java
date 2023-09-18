@@ -96,9 +96,10 @@ public class UserRepository extends AbstractUserRequest implements IGenericRepos
 	public boolean update(User user) {
 		Object[] param = { user.getFirstname(), 
 				user.getLastname(), 
-				user.getUsername(), user.getEmail(), 
+				user.getUsername(), 
+				user.getEmail(), 
+				user.getJobTitle(), 
 				user.getRole(), 
-				user.getSubrole(), 
 				user.getStatus(), 
 				user.getTeam().getId(),
 				TimeHelper.timestampNow(),
@@ -120,8 +121,8 @@ public class UserRepository extends AbstractUserRequest implements IGenericRepos
 			ps.setString(5, user.getUsername());
 			ps.setString(6, user.getEmail());
 			ps.setString(7, user.getPassword());
-			ps.setString(8, user.getRole());
-			ps.setString(9, user.getSubrole()!=null? user.getRole():RoleEnum.USER.toString());
+			ps.setString(8, user.getJobTitle());
+			ps.setString(9, user.getRole());
 			ps.setString(10, user.getStatus());
 			ps.setTimestamp(11, TimeHelper.timestampNow());
 			return ps;

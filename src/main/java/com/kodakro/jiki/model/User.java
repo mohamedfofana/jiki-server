@@ -35,9 +35,9 @@ public class User implements UserDetails{
 	
 	private String password;
 
+	private String jobTitle;
+	
 	private String role;
-
-	private String subrole;
 
 	private String status;
 

@@ -95,6 +95,16 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 	}
 	
 	@Override
+	public List<Story> findByReporter(Long id) {
+		final String whereSql= " AND ST.REPORTER_ID =?";
+		Object[] param = {id};
+		int[] types = {Types.INTEGER};
+		List<Story> stories = jdbcTemplate.query(getJoinSelectOnBacklogsProject(whereSql), param, types,
+				new StoryRowMapper());
+		return stories;
+	}
+	
+	@Override
 	public List<Story> findByProjectIdAndSprintId(Long projectId, Long sprintId) {
 		final String whereProject= " AND ST.PROJECT_ID =?";
 		Object[] param = {projectId, sprintId};
@@ -270,15 +280,16 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 			ps.setString(8, story.getTitle());
 			ps.setString(9, story.getDescription());
 			ps.setString(10, story.getType());
-			ps.setString(11, story.getStatus());
-			ps.setString(12, story.getPriority());
-			ps.setInt(13, story.getStoryPoints());
+			ps.setString(11, story.getScope());
+			ps.setString(12, story.getStatus());
+			ps.setString(13, story.getPriority());
+			ps.setInt(14, story.getStoryPoints());
 			if(story.getAppliVersion() != null) {
-				ps.setString(14, story.getAppliVersion());
+				ps.setString(15, story.getAppliVersion());
 			}else {
-				ps.setNull(14,  Types.VARCHAR);
+				ps.setNull(15,  Types.VARCHAR);
 			}
-			ps.setTimestamp(15, story.getCreationDate());
+			ps.setTimestamp(16, story.getCreationDate());
 			return ps;
 		});
 		return story;

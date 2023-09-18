@@ -51,8 +51,13 @@ public class StoryService {
 		return stories;
 	}
 
-	public List<Story> findByProject(Long id){
-		List<Story> stories= storyRepository.findByProject(id);		
+	public List<Story> findByProject(Long projectId){
+		List<Story> stories= storyRepository.findByProject(projectId);		
+		return stories;
+	}
+
+	public List<Story> findByReporter(Long reporterId) {
+		List<Story> stories= storyRepository.findByReporter(reporterId);		
 		return stories;
 	}
 	
@@ -159,4 +164,5 @@ public class StoryService {
 	public void moveToSprint(Long backlogId, List<Story> stories) {
 		storyRepository.moveToSprint(backlogId, stories);
 	}
+
 }

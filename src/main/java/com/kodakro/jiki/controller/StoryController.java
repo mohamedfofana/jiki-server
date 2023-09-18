@@ -54,6 +54,11 @@ public class StoryController {
 		return storyService.findByProject(projectId);
 	}
 	
+	@GetMapping("/reporter/{id}")
+	public List<Story> findByReporter(@PathVariable("id") Long reporterId){
+		return storyService.findByReporter(reporterId);
+	}
+	
 	@GetMapping("/project/{projectId}/sprint/{sprintId}")
 	public List<Story> findByProjectIdAndSprintId(@PathVariable("projectId") Long projectId, @PathVariable("sprintId") Long sprintId){
 		return storyService.getStoryByProjectIdAndSprintId(projectId, sprintId);
