@@ -79,7 +79,7 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 		final String whereSql= " AND ST.SPRINT_ID IS NULL AND ST.PROJECT_ID =? AND BA_ASS.ID IS NOT NULL";
 		Object[] param = {id};
 		int[] types = {Types.INTEGER};
-		List<Story> stories = jdbcTemplate.query(getJoinSelectOnBacklogsProject(whereSql), param, types,
+		List<Story> stories = jdbcTemplate.query(getJoinSelectOnProjectBacklog(whereSql), param, types,
 				new StoryRowMapper());
 		return stories;
 	}
@@ -89,7 +89,7 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 		final String whereSql= " AND ST.PROJECT_ID =?";
 		Object[] param = {id};
 		int[] types = {Types.INTEGER};
-		List<Story> stories = jdbcTemplate.query(getJoinSelectOnBacklogsProject(whereSql), param, types,
+		List<Story> stories = jdbcTemplate.query(getJoinSelectOnProjectBacklog(whereSql), param, types,
 				new StoryRowMapper());
 		return stories;
 	}
@@ -99,7 +99,7 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 		final String whereSql= " AND ST.REPORTER_ID =?";
 		Object[] param = {id};
 		int[] types = {Types.INTEGER};
-		List<Story> stories = jdbcTemplate.query(getJoinSelectOnBacklogsProject(whereSql), param, types,
+		List<Story> stories = jdbcTemplate.query(getJoinSelect(whereSql), param, types,
 				new StoryRowMapper());
 		return stories;
 	}

@@ -190,7 +190,35 @@ public abstract class AbstractStoryRequest {
 		return sb.toString();
 	}
 	
-	protected String getJoinSelectOnBacklogsProject(String whereSql) {
+	protected String getJoinSelectOnProjectBacklog(String whereSql) {
+		StringBuilder sb = new StringBuilder(SELECT_SQL);		
+		sb.append(COLUMNS_SQL);
+		sb.append(", ");
+		sb.append(AbstractSprintRequest.ASSIGNED_COLUMNS_SQL);
+		sb.append(", ");
+		sb.append(AbstractProjectRequest.ASSIGNED_COLUMNS_SQL);
+		sb.append(", ");
+		sb.append(AbstractBacklogRequest.ASSIGNED_COLUMNS_SQL);
+		sb.append(", ");
+		sb.append(AbstractUserRequest.REPORTER_COLUMNS_SQL);
+		sb.append(", ");
+		sb.append(AbstractTeamRequest.ASSIGNED_COLUMNS_SQL);
+		sb.append(", ");
+		sb.append(AbstractUserRequest.ASSIGNED_COLUMNS_SQL);
+		sb.append(FROM_SQL);		
+		sb.append(JOIN_BACKLOG);
+		if (whereSql != null) {
+			sb.append(whereSql);
+		}
+		sb.append(JOIN_PROJECT);
+		sb.append(JOIN_REPORTER);
+		sb.append(LEFT_JOIN_SPRINT);
+		sb.append(LEFT_JOIN_ASSIGNED_TEAM);
+		sb.append(LEFT_JOIN_ASSIGNED_USER);
+		return sb.toString();
+	}
+	
+	protected String getJoinSelectOnProject(String whereSql) {
 		StringBuilder sb = new StringBuilder(SELECT_SQL);		
 		sb.append(COLUMNS_SQL);
 		sb.append(", ");

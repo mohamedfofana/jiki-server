@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kodakro.jiki.exception.CustomResponseType;
-import com.kodakro.jiki.model.Project;
 import com.kodakro.jiki.model.Team;
 import com.kodakro.jiki.service.TeamService;
 

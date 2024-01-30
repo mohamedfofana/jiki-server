@@ -5,8 +5,6 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
-import com.kodakro.jiki.model.Backlog;
-import com.kodakro.jiki.model.Project;
 import com.kodakro.jiki.model.Team;
 import com.kodakro.jiki.model.User;
 

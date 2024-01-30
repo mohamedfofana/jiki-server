@@ -11,7 +11,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.kodakro.jiki.model.User;
 import com.kodakro.jiki.model.Version;
 import com.kodakro.jiki.repository.intrf.IGenericRepository;
 import com.kodakro.jiki.repository.intrf.IVersionRepository;
