@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kodakro.jiki.exception.CustomResponseType;
 import com.kodakro.jiki.model.Project;
-import com.kodakro.jiki.model.Sprint;
 import com.kodakro.jiki.service.ProjectService;
 
 @RestController
