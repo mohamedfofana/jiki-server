@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.kodakro.jiki.enums.SprintStatusEnum;
+import com.kodakro.jiki.exception.ResourceNotFoundException;
 import com.kodakro.jiki.model.Sprint;
 import com.kodakro.jiki.repository.intrf.IGenericRepository;
 import com.kodakro.jiki.repository.intrf.ISprintRepository;
@@ -56,7 +57,7 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 			sprint = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
 				new SprintRowMapper());
 		}catch(EmptyResultDataAccessException e) {
-			// log No sprint found
+			throw new ResourceNotFoundException("findById", "Sprint", "id", id);
 		}
 		return Optional.ofNullable(sprint);
 	}
@@ -74,7 +75,7 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 				sprint = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
 						new SprintRowMapper());			
 			}catch(EmptyResultDataAccessException e) {
-				// log No sprint found
+				throw new ResourceNotFoundException("findCurrentByProjectId", "Sprints.Project", "id", id);
 			}
 		}else {
 			sprint = runningSprint.get();
@@ -94,7 +95,7 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 			sprint = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
 					new SprintRowMapper());			
 		}catch(EmptyResultDataAccessException e) {
-			// log No sprint found
+			throw new ResourceNotFoundException("findRunningByProjectId", "Sprints.Project", "id", id);
 		}
 		return Optional.ofNullable(sprint);
 	}
@@ -178,7 +179,7 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 			sprint = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
 					new SprintRowMapper());
 		}catch (EmptyResultDataAccessException e) {
-			// log no entity found
+			throw new ResourceNotFoundException("exists", "Sprints.Project", "id", id);
 		}
 		return Optional.ofNullable(sprint);
 	}

@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.kodakro.jiki.enums.ProjectStatusEnum;
+import com.kodakro.jiki.exception.ResourceNotFoundException;
 import com.kodakro.jiki.model.Project;
 import com.kodakro.jiki.repository.intrf.IGenericRepository;
 import com.kodakro.jiki.repository.intrf.IProjectRepository;
@@ -46,7 +47,7 @@ public class ProjectRepository extends AbstractProjectRequest implements IGeneri
 		try {		
 			project = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types, new ProjectRowMapper());
 		}catch(EmptyResultDataAccessException e) {
-			// Log no project found
+			throw new ResourceNotFoundException("findByTeam", "Projects.Team", "id", id);
 		}
 		return project;
 	}
@@ -68,7 +69,7 @@ public class ProjectRepository extends AbstractProjectRequest implements IGeneri
 			project = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
 					new ProjectRowMapper());
 		}catch(EmptyResultDataAccessException e) {
-			// Log no project found
+			throw new ResourceNotFoundException("findById", "Project", "id", id);
 		}
 		return Optional.ofNullable(project);
 	}
@@ -127,7 +128,7 @@ public class ProjectRepository extends AbstractProjectRequest implements IGeneri
 			project = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
 					new ProjectRowMapper());
 		}catch (EmptyResultDataAccessException e) {
-			// log no user found
+			throw new ResourceNotFoundException("exists", "Project", "id", id);
 		}
 		return Optional.ofNullable(project);
 	}

@@ -11,6 +11,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.kodakro.jiki.exception.ResourceNotFoundException;
 import com.kodakro.jiki.model.Version;
 import com.kodakro.jiki.repository.intrf.IGenericRepository;
 import com.kodakro.jiki.repository.intrf.IVersionRepository;
@@ -76,7 +77,7 @@ public class VersionRepository extends AbstractVersionRequest implements IGeneri
 			version = jdbcTemplate.queryForObject(getNoJointSelect(whereSql), param, types,
 					new VersionRowMapper());
 		}catch (EmptyResultDataAccessException e) {
-			// log no user found
+			throw new ResourceNotFoundException("exists", "Version", "id", id);
 		}
 		return Optional.ofNullable(version);
 	}

@@ -58,7 +58,7 @@ public class UserService {
 
 	public User update(User user) {
 		if(user != null) {
-			User dbUser= userRepository.exists(user.getId()).orElseThrow(() -> new ResourceNotFoundException("User", "id", user.getId()));
+			User dbUser= userRepository.exists(user.getId()).orElseThrow(() -> new ResourceNotFoundException("update", "User", "id", user.getId()));
 			if (dbUser!=null) {
 				if (user.getUsername() != null)
 					dbUser.setUsername(user.getUsername());

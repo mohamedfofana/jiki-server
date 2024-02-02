@@ -11,6 +11,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.kodakro.jiki.exception.ResourceNotFoundException;
 import com.kodakro.jiki.model.Category;
 import com.kodakro.jiki.repository.intrf.ICategoryRepository;
 import com.kodakro.jiki.repository.intrf.IGenericRepository;
@@ -76,7 +77,7 @@ public class CategoryRepository extends AbstractCategoryRequest implements IGene
 			category = jdbcTemplate.queryForObject(getNoJointSelect(whereSql), param, types,
 					new CategoryRowMapper());
 		}catch (EmptyResultDataAccessException e) {
-			// log no user found
+			throw new ResourceNotFoundException("exists", "Category", "id", id);
 		}
 		return Optional.ofNullable(category);
 	}

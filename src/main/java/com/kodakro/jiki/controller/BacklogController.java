@@ -57,4 +57,18 @@ public class BacklogController {
 		backlogService.update(backlog);
 		return ResponseEntity.ok().build();
 	}
+	
+	/**
+	 * Prefer to use Global ExceptionHandler with ControllerAdvice 
+	 * to avoid creating ExceptionHandler inside each controller
+	 * @param ex exception to catch
+	 * @return
+	 */
+//	@ExceptionHandler(ResourceNotFoundException.class)
+//	public ResponseEntity handleResourceNotFoundException(final ResourceNotFoundException ex) {
+//		return new ResponseEntity<CustomResponseType<Backlog>>(
+//				new CustomResponseType<Backlog>("KO", null, ex.getResourceName() 
+//											   +" "+ ex.getFieldName()+ " " + ex.getFieldValue() + " already exists !"), 
+//											   HttpStatus.NOT_FOUND);
+//	}
 }

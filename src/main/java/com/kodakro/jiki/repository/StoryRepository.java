@@ -12,6 +12,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.kodakro.jiki.exception.ResourceNotFoundException;
 import com.kodakro.jiki.helpers.TimeHelper;
 import com.kodakro.jiki.model.Story;
 import com.kodakro.jiki.repository.intrf.IGenericRepository;
@@ -54,7 +55,7 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 			story = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
 					new StoryRowMapper());
 		}catch (EmptyResultDataAccessException e) {
-			// log no Story found
+			throw new ResourceNotFoundException("exists", "Story", "id", id);
 		}
 		return Optional.ofNullable(story);
 	}
@@ -69,7 +70,7 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 			story = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
 					new StoryRowMapper());
 		}catch (EmptyResultDataAccessException e) {
-			// log no Story found
+			throw new ResourceNotFoundException("findById", "Story", "id", id);
 		}
 		return Optional.ofNullable(story);
 	}
@@ -135,6 +136,7 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 		int[] types = {Types.BIGINT};
 		if (story.isPresent())
 			return jdbcTemplate.update(sql, param, types)==1;
+		
 		return false;
 	}
 

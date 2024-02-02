@@ -11,6 +11,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.kodakro.jiki.exception.ResourceNotFoundException;
 import com.kodakro.jiki.model.Backlog;
 import com.kodakro.jiki.repository.intrf.IGenericRepository;
 import com.kodakro.jiki.repository.mapper.BacklogRowMapper;
@@ -39,7 +40,8 @@ public class BacklogRepository extends AbstractBacklogRequest implements IGeneri
 	@Override
 	public Long maxId() {
 		final Long maxId = jdbcTemplate.queryForObject(getMaxId(), null, null, Long.class );
-		return maxId!=null?maxId:1;
+		
+		return maxId != null? maxId:1;
 	}
 
 	@Override
@@ -48,12 +50,12 @@ public class BacklogRepository extends AbstractBacklogRequest implements IGeneri
 		Object[] param = {id};
 		int[] types = {Types.INTEGER};
 		Backlog backlog = null;
-		try{
-			backlog = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
-				new BacklogRowMapper());
-		}catch (EmptyResultDataAccessException e) {
-			// Log no Backlog found
+		try {
+			backlog = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types, new BacklogRowMapper());
+		} catch (EmptyResultDataAccessException ex) {
+			throw new ResourceNotFoundException("findById", "Backlog", "id", id);
 		}
+		
 		return Optional.ofNullable(backlog);
 	}
 
@@ -63,6 +65,9 @@ public class BacklogRepository extends AbstractBacklogRequest implements IGeneri
 		Object[] backlogId = new Object[] {id};
 		if (backlog.isPresent())
 			return jdbcTemplate.update(sqlDelete, backlogId)==1;
+		
+		// TODO Log Attempted to delete ressource
+		
 		return false;
 	}
 
@@ -96,12 +101,9 @@ public class BacklogRepository extends AbstractBacklogRequest implements IGeneri
 		Object[] param = {id};
 		int[] types = {Types.INTEGER};
 		Backlog backlog = null;
-		try {
-			backlog = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
-					new BacklogRowMapper());
-		}catch (EmptyResultDataAccessException e) {
-			// log no enity found
-		}
+		backlog = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
+				new BacklogRowMapper());
+		
 		return Optional.ofNullable(backlog);
 	}
 }

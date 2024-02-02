@@ -25,7 +25,7 @@ public class BacklogService {
 		if (backlog.isPresent())
 			return backlog.get();
 		else
-			return null;
+			throw new ResourceNotFoundException("findById", "Backlog", "id", id);
 	}
 
 	public boolean deleteById(Long id){
@@ -35,12 +35,13 @@ public class BacklogService {
 	public Backlog create(Backlog backlog) {
 		Optional<Backlog> dbBacklog = backlogRepository.exists(backlog.getId());
 		if (dbBacklog.isPresent()) {
+			// TODO log unable to create backlog
 			return null;
 		}
 		return backlogRepository.create(backlog);
 	}
 	public void update(Backlog backlog) {
-		Backlog dbBacklog= backlogRepository.exists(backlog.getId()).orElseThrow(() -> new ResourceNotFoundException("Backlog", "id", backlog.getId()));
+		Backlog dbBacklog= backlogRepository.exists(backlog.getId()).orElseThrow(() -> new ResourceNotFoundException("update", "Backlog", "id", backlog.getId()));
 		if (dbBacklog!=null) {
 			if (backlog.getTitle() != null)
 				dbBacklog.setTitle(backlog.getTitle());

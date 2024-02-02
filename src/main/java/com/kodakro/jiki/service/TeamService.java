@@ -33,7 +33,7 @@ public class TeamService {
 	}
 	
 	public Team update(Team team){
-		Team dbTeam =  teamRepository.exists(team.getId()).orElseThrow(() -> new ResourceNotFoundException("Team", "id", team.getId()));
+		Team dbTeam =  teamRepository.exists(team.getId()).orElseThrow(() -> new ResourceNotFoundException("update", "Team", "id", team.getId()));
 		if (dbTeam!=null) {
 			if(team.getName() != null)
 				dbTeam.setName(team.getName());

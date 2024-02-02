@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.kodakro.jiki.enums.TeamStatusEnum;
+import com.kodakro.jiki.exception.ResourceNotFoundException;
 import com.kodakro.jiki.model.Team;
 import com.kodakro.jiki.repository.intrf.IGenericRepository;
 import com.kodakro.jiki.repository.intrf.ITeamRepository;
@@ -67,12 +68,8 @@ public class TeamRepository extends AbstractTeamRequest implements IGenericRepos
 		Object[] param = {id};
 		int[] types = {Types.INTEGER};
 		Team team = null;
-		try{
-			team = jdbcTemplate.queryForObject(getSelect(), param, types,
+		team = jdbcTemplate.queryForObject(getSelect(), param, types,
 					new TeamRowMapper());
-		}catch (EmptyResultDataAccessException e) {
-			// Log no Backlog found
-		}
 		return Optional.ofNullable(team);
 	}
 
@@ -124,7 +121,7 @@ public class TeamRepository extends AbstractTeamRequest implements IGenericRepos
 			team = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
 					new TeamRowMapper());
 		}catch (EmptyResultDataAccessException e) {
-			// log no entity found
+			throw new ResourceNotFoundException("exists", "Team", "id", id);
 		}
 		return Optional.ofNullable(team);
 	}

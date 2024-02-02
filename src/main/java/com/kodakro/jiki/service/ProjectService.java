@@ -60,7 +60,7 @@ public class ProjectService {
 	}
 
 	public Project update(Project project){
-		Project dbProject =  projectRepository.exists(project.getId()).orElseThrow(() -> new ResourceNotFoundException("Project", "id", project.getId()));
+		Project dbProject =  projectRepository.exists(project.getId()).orElseThrow(() -> new ResourceNotFoundException("update", "Project", "id", project.getId()));
 		if (dbProject!=null) {
 			if (project.getShortname() != null)
 				dbProject.setShortname(project.getShortname());

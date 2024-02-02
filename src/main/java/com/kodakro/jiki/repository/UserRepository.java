@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import com.kodakro.jiki.enums.RoleEnum;
 import com.kodakro.jiki.enums.UserStatusEnum;
+import com.kodakro.jiki.exception.ResourceNotFoundException;
 import com.kodakro.jiki.helpers.TimeHelper;
 import com.kodakro.jiki.model.User;
 import com.kodakro.jiki.repository.intrf.IGenericRepository;
@@ -140,7 +141,7 @@ public class UserRepository extends AbstractUserRequest implements IGenericRepos
 			user = jdbcTemplate.queryForObject(getNoJointSelect(whereSql), param, types,
 					new UserRowMapper());
 		}catch (EmptyResultDataAccessException e) {
-			// log no user found
+			throw new ResourceNotFoundException("exists", "User", "id", id);
 		}
 		return Optional.ofNullable(user);
 	}
