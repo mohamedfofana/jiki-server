@@ -21,7 +21,6 @@ import com.kodakro.jiki.repository.request.AbstractBacklogRequest;
 public class BacklogRepository extends AbstractBacklogRequest implements IGenericRepository<Backlog> {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-
 	
 	@Value("${sql.backlog.insert}")
 	private String sqlInsert;
@@ -66,6 +65,7 @@ public class BacklogRepository extends AbstractBacklogRequest implements IGeneri
 		if (backlog.isPresent())
 			return jdbcTemplate.update(sqlDelete, backlogId)==1;
 		
+//		log.
 		// TODO Log Attempted to delete ressource
 		
 		return false;

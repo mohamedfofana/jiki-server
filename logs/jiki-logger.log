@@ -1,0 +1,39 @@
+2024-02-02 15:03:22,036 INFO o.h.v.i.u.Version [background-preinit] HV000001: Hibernate Validator 6.2.0.Final
+2024-02-02 15:03:22,062 INFO o.s.b.StartupInfoLogger [main] Starting JikiServerApplication using Java 17.0.7 on Thinkpad1-MAPLR with PID 31520 (C:\projets\jiki\jiki-server\target\classes started by Mohamed Fofana in C:\projets\jiki\jiki-server)
+2024-02-02 15:03:22,066 INFO o.s.b.SpringApplication [main] No active profile set, falling back to default profiles: default
+2024-02-02 15:03:22,582 INFO o.s.d.r.c.RepositoryConfigurationDelegate [main] Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-02-02 15:03:22,592 INFO o.s.d.r.c.RepositoryConfigurationDelegate [main] Finished Spring Data repository scanning in 4 ms. Found 0 JPA repository interfaces.
+2024-02-02 15:03:22,960 INFO o.s.b.w.e.t.TomcatWebServer [main] Tomcat initialized with port(s): 8181 (http)
+2024-02-02 15:03:22,967 INFO o.a.j.l.DirectJDKLog [main] Initializing ProtocolHandler ["http-nio-8181"]
+2024-02-02 15:03:22,967 INFO o.a.j.l.DirectJDKLog [main] Starting service [Tomcat]
+2024-02-02 15:03:22,967 INFO o.a.j.l.DirectJDKLog [main] Starting Servlet engine: [Apache Tomcat/9.0.54]
+2024-02-02 15:03:23,029 INFO o.a.j.l.DirectJDKLog [main] Initializing Spring embedded WebApplicationContext
+2024-02-02 15:03:23,030 INFO o.s.b.w.s.c.ServletWebServerApplicationContext [main] Root WebApplicationContext: initialization completed in 928 ms
+2024-02-02 15:03:23,104 WARN c.h.l.StandardLoggerFactory$StandardLogger [main] Hazelcast is starting in a Java modular environment (Java 9 and newer) but without proper access to required Java packages. Use additional Java arguments to provide Hazelcast access to Java internal API. The internal API access is used to get the best performance results. Arguments to be used:
+ --add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED
+2024-02-02 15:03:23,212 INFO c.h.l.StandardLoggerFactory$StandardLogger [main] [192.168.2.36]:5701 [dev] [4.1.5] Hazelcast 4.1.5 (20210817 - 270c5be) starting at [192.168.2.36]:5701
+2024-02-02 15:03:23,438 INFO c.h.l.StandardLoggerFactory$StandardLogger [main] [192.168.2.36]:5701 [dev] [4.1.5] No discovery strategy is applicable for auto-detection
+2024-02-02 15:03:23,518 INFO c.h.l.StandardLoggerFactory$StandardLogger [main] [192.168.2.36]:5701 [dev] [4.1.5] Using Multicast discovery
+2024-02-02 15:03:23,522 WARN c.h.l.StandardLoggerFactory$StandardLogger [main] [192.168.2.36]:5701 [dev] [4.1.5] CP Subsystem is not enabled. CP data structures will operate in UNSAFE mode! Please note that UNSAFE mode will not provide strong consistency guarantees.
+2024-02-02 15:03:23,679 INFO c.h.l.StandardLoggerFactory$StandardLogger [main] [192.168.2.36]:5701 [dev] [4.1.5] Diagnostics disabled. To enable add -Dhazelcast.diagnostics.enabled=true to the JVM arguments.
+2024-02-02 15:03:23,683 INFO c.h.l.StandardLoggerFactory$StandardLogger [main] [192.168.2.36]:5701 [dev] [4.1.5] [192.168.2.36]:5701 is STARTING
+2024-02-02 15:03:26,408 INFO c.h.l.StandardLoggerFactory$StandardLogger [main] [192.168.2.36]:5701 [dev] [4.1.5] 
+
+Members {size:1, ver:1} [
+	Member [192.168.2.36]:5701 - 2f3e0922-417b-4947-aa64-dfcd24bfa024 this
+]
+
+2024-02-02 15:03:26,419 INFO c.h.l.StandardLoggerFactory$StandardLogger [main] [192.168.2.36]:5701 [dev] [4.1.5] [192.168.2.36]:5701 is STARTED
+2024-02-02 15:03:26,502 INFO o.h.j.i.u.LogHelper [main] HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-02-02 15:03:26,536 INFO o.h.Version [main] HHH000412: Hibernate ORM core version 5.4.32.Final
+2024-02-02 15:03:26,623 INFO o.h.a.c.r.j.JavaReflectionManager [main] HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2024-02-02 15:03:26,692 INFO c.z.h.HikariDataSource [main] HikariPool-1 - Starting...
+2024-02-02 15:03:26,798 INFO c.z.h.HikariDataSource [main] HikariPool-1 - Start completed.
+2024-02-02 15:03:26,808 INFO o.h.d.Dialect [main] HHH000400: Using dialect: org.hibernate.dialect.MySQL5Dialect
+2024-02-02 15:03:26,950 INFO o.h.e.t.j.p.i.JtaPlatformInitiator [main] HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2024-02-02 15:03:26,956 INFO o.s.o.j.AbstractEntityManagerFactoryBean [main] Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-02-02 15:03:27,080 WARN o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration [main] spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-02-02 15:03:27,199 INFO o.s.s.w.DefaultSecurityFilterChain [main] Will secure any request with [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@47ab3688, org.springframework.security.web.context.SecurityContextPersistenceFilter@e638553, org.springframework.security.web.header.HeaderWriterFilter@67167f8f, org.springframework.web.filter.CorsFilter@47fbf95e, org.springframework.security.web.authentication.logout.LogoutFilter@31921151, com.kodakro.jiki.security.jwt.JWTAuthenticationFilter@49482761, com.kodakro.jiki.security.jwt.JWTAuthorizationFilter@6ac0fd1d, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@75d0cac6, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@6ace3, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@744199bb, org.springframework.security.web.session.SessionManagementFilter@733345f5, org.springframework.security.web.access.ExceptionTranslationFilter@4505015b, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@13e6c544]
+2024-02-02 15:03:27,442 INFO o.a.j.l.DirectJDKLog [main] Starting ProtocolHandler ["http-nio-8181"]
+2024-02-02 15:03:27,450 INFO o.s.b.w.e.t.TomcatWebServer [main] Tomcat started on port(s): 8181 (http) with context path ''
+2024-02-02 15:03:27,457 INFO o.s.b.StartupInfoLogger [main] Started JikiServerApplication in 5.732 seconds (JVM running for 6.383)
