@@ -23,10 +23,10 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity handleResourceNotFoundException(final ResourceNotFoundException ex) {
+		final String message = ex.getResourceName() 
+									   + "."+ ex.getFieldName()+ "=" + ex.getFieldValue() + " not found.";
 		return new ResponseEntity<CustomResponseType<Backlog>>(
-				new CustomResponseType<Backlog>("KO", null, ex.getResourceName() 
-											   + "."+ ex.getFieldName()+ "=" + ex.getFieldValue() + " not found."), 
-											   HttpStatus.NOT_FOUND);
+				new CustomResponseType<Backlog>("KO", null, message), HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler(IncorrectResultSizeDataAccessException.class)

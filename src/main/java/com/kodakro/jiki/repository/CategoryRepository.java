@@ -5,6 +5,8 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -20,7 +22,8 @@ import com.kodakro.jiki.repository.request.AbstractCategoryRequest;
 
 @Repository
 public class CategoryRepository extends AbstractCategoryRequest implements IGenericRepository<Category>, ICategoryRepository{
-
+	private static final Logger logger = LoggerFactory.getLogger(CategoryRepository.class);
+	
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	
@@ -77,6 +80,7 @@ public class CategoryRepository extends AbstractCategoryRequest implements IGene
 			category = jdbcTemplate.queryForObject(getNoJointSelect(whereSql), param, types,
 					new CategoryRowMapper());
 		}catch (EmptyResultDataAccessException e) {
+			logger.info("Unable to find Category " + id);
 			throw new ResourceNotFoundException("exists", "Category", "id", id);
 		}
 		return Optional.ofNullable(category);

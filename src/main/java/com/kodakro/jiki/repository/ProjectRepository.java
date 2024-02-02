@@ -5,6 +5,8 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -21,6 +23,8 @@ import com.kodakro.jiki.repository.request.AbstractProjectRequest;
 
 @Repository
 public class ProjectRepository extends AbstractProjectRequest implements IGenericRepository<Project>, IProjectRepository {
+	private static final Logger logger = LoggerFactory.getLogger(ProjectRepository.class);
+	
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	
@@ -69,6 +73,7 @@ public class ProjectRepository extends AbstractProjectRequest implements IGeneri
 			project = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
 					new ProjectRowMapper());
 		}catch(EmptyResultDataAccessException e) {
+			logger.info("Unable to find Project " + id);
 			throw new ResourceNotFoundException("findById", "Project", "id", id);
 		}
 		return Optional.ofNullable(project);
@@ -128,6 +133,7 @@ public class ProjectRepository extends AbstractProjectRequest implements IGeneri
 			project = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
 					new ProjectRowMapper());
 		}catch (EmptyResultDataAccessException e) {
+			logger.info("Unable to find Project " + id);
 			throw new ResourceNotFoundException("exists", "Project", "id", id);
 		}
 		return Optional.ofNullable(project);

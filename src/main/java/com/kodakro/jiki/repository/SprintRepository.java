@@ -5,6 +5,8 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -21,6 +23,8 @@ import com.kodakro.jiki.repository.request.AbstractSprintRequest;
 
 @Repository
 public class SprintRepository extends AbstractSprintRequest implements IGenericRepository<Sprint>, ISprintRepository {
+	private static final Logger logger = LoggerFactory.getLogger(SprintRepository.class);
+	
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	
@@ -57,6 +61,7 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 			sprint = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
 				new SprintRowMapper());
 		}catch(EmptyResultDataAccessException e) {
+			logger.info("Unable to find Sprint " + id);
 			throw new ResourceNotFoundException("findById", "Sprint", "id", id);
 		}
 		return Optional.ofNullable(sprint);
@@ -75,6 +80,7 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 				sprint = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
 						new SprintRowMapper());			
 			}catch(EmptyResultDataAccessException e) {
+				logger.info("Unable to find Sprints in project " + id);
 				throw new ResourceNotFoundException("findCurrentByProjectId", "Sprints.Project", "id", id);
 			}
 		}else {
@@ -95,6 +101,7 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 			sprint = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
 					new SprintRowMapper());			
 		}catch(EmptyResultDataAccessException e) {
+			logger.info("Unable to find Sprints in project " + id);
 			throw new ResourceNotFoundException("findRunningByProjectId", "Sprints.Project", "id", id);
 		}
 		return Optional.ofNullable(sprint);
@@ -179,7 +186,8 @@ public class SprintRepository extends AbstractSprintRequest implements IGenericR
 			sprint = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
 					new SprintRowMapper());
 		}catch (EmptyResultDataAccessException e) {
-			throw new ResourceNotFoundException("exists", "Sprints.Project", "id", id);
+			logger.info("Unable to find Sprint " + id);
+			throw new ResourceNotFoundException("exists", "Sprints", "id", id);
 		}
 		return Optional.ofNullable(sprint);
 	}

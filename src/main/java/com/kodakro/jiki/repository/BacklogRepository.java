@@ -5,6 +5,8 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -19,9 +21,10 @@ import com.kodakro.jiki.repository.request.AbstractBacklogRequest;
 
 @Repository
 public class BacklogRepository extends AbstractBacklogRequest implements IGenericRepository<Backlog> {
+	private static final Logger logger = LoggerFactory.getLogger(BacklogRepository.class);
+	
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-
 	
 	@Value("${sql.backlog.insert}")
 	private String sqlInsert;
@@ -53,6 +56,7 @@ public class BacklogRepository extends AbstractBacklogRequest implements IGeneri
 		try {
 			backlog = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types, new BacklogRowMapper());
 		} catch (EmptyResultDataAccessException ex) {
+			logger.info("Unable to find backlog " + id);
 			throw new ResourceNotFoundException("findById", "Backlog", "id", id);
 		}
 		
@@ -66,8 +70,7 @@ public class BacklogRepository extends AbstractBacklogRequest implements IGeneri
 		if (backlog.isPresent())
 			return jdbcTemplate.update(sqlDelete, backlogId)==1;
 		
-		// TODO Log Attempted to delete ressource
-		
+		logger.info("Unable to delete backlog " + id);
 		return false;
 	}
 

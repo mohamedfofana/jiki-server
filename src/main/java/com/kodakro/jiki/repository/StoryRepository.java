@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -22,6 +24,8 @@ import com.kodakro.jiki.repository.request.AbstractStoryRequest;
 
 @Repository
 public class StoryRepository extends AbstractStoryRequest  implements IGenericRepository<Story>, IStoryRepository {
+	private static final Logger logger = LoggerFactory.getLogger(StoryRepository.class);
+	
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	
@@ -55,6 +59,7 @@ public class StoryRepository extends AbstractStoryRequest  implements IGenericRe
 			story = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
 					new StoryRowMapper());
 		}catch (EmptyResultDataAccessException e) {
+			logger.info("Unable to find Story " + id);
 			throw new ResourceNotFoundException("exists", "Story", "id", id);
 		}
 		return Optional.ofNullable(story);

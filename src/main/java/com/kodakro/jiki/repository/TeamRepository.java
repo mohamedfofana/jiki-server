@@ -5,6 +5,8 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -21,6 +23,8 @@ import com.kodakro.jiki.repository.request.AbstractTeamRequest;
 
 @Repository
 public class TeamRepository extends AbstractTeamRequest implements IGenericRepository<Team>, ITeamRepository {
+	private static final Logger logger = LoggerFactory.getLogger(TeamRepository.class);
+	
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	
@@ -70,6 +74,7 @@ public class TeamRepository extends AbstractTeamRequest implements IGenericRepos
 		Team team = null;
 		team = jdbcTemplate.queryForObject(getSelect(), param, types,
 					new TeamRowMapper());
+		
 		return Optional.ofNullable(team);
 	}
 
@@ -121,6 +126,7 @@ public class TeamRepository extends AbstractTeamRequest implements IGenericRepos
 			team = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
 					new TeamRowMapper());
 		}catch (EmptyResultDataAccessException e) {
+			logger.info("Unable to find Team " + id);
 			throw new ResourceNotFoundException("exists", "Team", "id", id);
 		}
 		return Optional.ofNullable(team);
