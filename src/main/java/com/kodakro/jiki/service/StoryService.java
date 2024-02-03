@@ -90,7 +90,7 @@ public class StoryService {
 	}
 
 	public void updateStory(Long id, Story story){
-		Story dbStory =  storyRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Story", "id", id));
+		Story dbStory =  storyRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("updateStory", "Story", "id", id));
 		if (dbStory!=null) {
 			dbStory.setAssignedUser(story.getAssignedUser());
 			dbStory.setAssignedTeam(story.getAssignedTeam());
@@ -111,7 +111,7 @@ public class StoryService {
 		}
 	}
 	public void updateStatus(Story story){
-		Story dbStory =  storyRepository.findById(story.getId()).orElseThrow(() -> new ResourceNotFoundException("Story", "id", story.getId()));
+		Story dbStory =  storyRepository.findById(story.getId()).orElseThrow(() -> new ResourceNotFoundException("updateStatus", "Story", "id", story.getId()));
 		if (dbStory!=null) {
 			dbStory.setStatus(story.getStatus());
 			storyRepository.updateStatus(dbStory);
@@ -119,7 +119,7 @@ public class StoryService {
 	}
 	
 	public void updateSprintAndBacklog(Story story){
-		Story dbStory =  storyRepository.exists(story.getId()).orElseThrow(() -> new ResourceNotFoundException("Story", "id", story.getId()));
+		Story dbStory =  storyRepository.exists(story.getId()).orElseThrow(() -> new ResourceNotFoundException("updateSprintAndBacklog", "Story", "id", story.getId()));
 		if (dbStory!=null) {
 			if( story.getSprint()!= null) {
 				Optional<Sprint> s = sprintRepository.findById(story.getSprint().getId());	

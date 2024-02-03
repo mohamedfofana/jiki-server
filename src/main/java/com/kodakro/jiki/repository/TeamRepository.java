@@ -5,6 +5,8 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -12,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.kodakro.jiki.enums.TeamStatusEnum;
+import com.kodakro.jiki.exception.ResourceNotFoundException;
 import com.kodakro.jiki.model.Team;
 import com.kodakro.jiki.repository.intrf.IGenericRepository;
 import com.kodakro.jiki.repository.intrf.ITeamRepository;
@@ -20,6 +23,8 @@ import com.kodakro.jiki.repository.request.AbstractTeamRequest;
 
 @Repository
 public class TeamRepository extends AbstractTeamRequest implements IGenericRepository<Team>, ITeamRepository {
+	private static final Logger logger = LoggerFactory.getLogger(TeamRepository.class);
+	
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	
@@ -67,12 +72,9 @@ public class TeamRepository extends AbstractTeamRequest implements IGenericRepos
 		Object[] param = {id};
 		int[] types = {Types.INTEGER};
 		Team team = null;
-		try{
-			team = jdbcTemplate.queryForObject(getSelect(), param, types,
+		team = jdbcTemplate.queryForObject(getSelect(), param, types,
 					new TeamRowMapper());
-		}catch (EmptyResultDataAccessException e) {
-			// Log no Backlog found
-		}
+		
 		return Optional.ofNullable(team);
 	}
 
@@ -124,7 +126,8 @@ public class TeamRepository extends AbstractTeamRequest implements IGenericRepos
 			team = jdbcTemplate.queryForObject(getExists(whereSql), param, types,
 					new TeamRowMapper());
 		}catch (EmptyResultDataAccessException e) {
-			// log no entity found
+			logger.info("Unable to find Team " + id);
+			throw new ResourceNotFoundException("exists", "Team", "id", id);
 		}
 		return Optional.ofNullable(team);
 	}

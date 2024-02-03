@@ -5,12 +5,15 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.kodakro.jiki.exception.ResourceNotFoundException;
 import com.kodakro.jiki.model.Version;
 import com.kodakro.jiki.repository.intrf.IGenericRepository;
 import com.kodakro.jiki.repository.intrf.IVersionRepository;
@@ -19,7 +22,8 @@ import com.kodakro.jiki.repository.request.AbstractVersionRequest;
 
 @Repository
 public class VersionRepository extends AbstractVersionRequest implements IGenericRepository<Version>, IVersionRepository{
-
+	private static final Logger logger = LoggerFactory.getLogger(VersionRepository.class);
+	
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	
@@ -76,7 +80,8 @@ public class VersionRepository extends AbstractVersionRequest implements IGeneri
 			version = jdbcTemplate.queryForObject(getNoJointSelect(whereSql), param, types,
 					new VersionRowMapper());
 		}catch (EmptyResultDataAccessException e) {
-			// log no user found
+			logger.info("Unable to find Version " + id);
+			throw new ResourceNotFoundException("exists", "Version", "id", id);
 		}
 		return Optional.ofNullable(version);
 	}

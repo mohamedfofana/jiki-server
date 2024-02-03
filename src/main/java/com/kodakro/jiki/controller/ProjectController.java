@@ -52,6 +52,7 @@ public class ProjectController {
 		final boolean status = projectService.deleteById(id);
 		if(status)
 			return new ResponseEntity<CustomResponseType<Project>>(new CustomResponseType<Project>("OK", null, "Project deleted"), HttpStatus.OK);
+		
 		return  new ResponseEntity<CustomResponseType<Project>>(new CustomResponseType<Project>("KO", null, "Unable to delete project with id = "+ id + "."), HttpStatus.CONFLICT);
 	}
 

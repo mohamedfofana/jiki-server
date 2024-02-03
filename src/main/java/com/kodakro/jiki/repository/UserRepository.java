@@ -5,15 +5,16 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.kodakro.jiki.enums.RoleEnum;
 import com.kodakro.jiki.enums.UserStatusEnum;
+import com.kodakro.jiki.exception.ResourceNotFoundException;
 import com.kodakro.jiki.helpers.TimeHelper;
 import com.kodakro.jiki.model.User;
 import com.kodakro.jiki.repository.intrf.IGenericRepository;
@@ -23,6 +24,8 @@ import com.kodakro.jiki.repository.request.AbstractUserRequest;
 
 @Repository
 public class UserRepository extends AbstractUserRequest implements IGenericRepository<User>, IUserRepository {
+	private static final Logger logger = LoggerFactory.getLogger(UserRepository.class);
+	
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	
@@ -72,12 +75,9 @@ public class UserRepository extends AbstractUserRequest implements IGenericRepos
 		Object[] param = {username};
 		int[] types = {Types.VARCHAR};
 		User user;
-		try{
-			user = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
+		user = jdbcTemplate.queryForObject(getJoinSelect(whereSql), param, types,
 					new UserRowMapper());
-		}catch(IncorrectResultSizeDataAccessException e) {
-			return Optional.empty();  
-		}	
+		
 		return Optional.ofNullable(user);
 		
 	}
@@ -140,7 +140,8 @@ public class UserRepository extends AbstractUserRequest implements IGenericRepos
 			user = jdbcTemplate.queryForObject(getNoJointSelect(whereSql), param, types,
 					new UserRowMapper());
 		}catch (EmptyResultDataAccessException e) {
-			// log no user found
+			logger.info("Unable to find User " + id);
+			throw new ResourceNotFoundException("exists", "User", "id", id);
 		}
 		return Optional.ofNullable(user);
 	}

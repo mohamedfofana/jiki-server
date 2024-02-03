@@ -53,7 +53,7 @@ public class SprintService {
 	}
 
 	public Sprint start(Sprint sprint) {
-		Sprint dbSprint= sprintRepository.exists(sprint.getId()).orElseThrow(() -> new ResourceNotFoundException("Sprint", "id", sprint.getId()));
+		Sprint dbSprint= sprintRepository.exists(sprint.getId()).orElseThrow(() -> new ResourceNotFoundException("start", "Sprint", "id", sprint.getId()));
 		if (dbSprint!=null) {
 			dbSprint.setStatus(sprint.getStatus());
 			dbSprint.setName(sprint.getName());
@@ -76,7 +76,7 @@ public class SprintService {
 	}
 
 	public Sprint close(@Valid Sprint sprint) {
-		Sprint dbSprint= sprintRepository.exists(sprint.getId()).orElseThrow(() -> new ResourceNotFoundException("Sprint", "id", sprint.getId()));
+		Sprint dbSprint= sprintRepository.exists(sprint.getId()).orElseThrow(() -> new ResourceNotFoundException("close", "Sprint", "id", sprint.getId()));
 		if (dbSprint!=null) {
 			dbSprint.setStatus(sprint.getStatus());
 			dbSprint.setUpdateDate(sprint.getUpdateDate());
