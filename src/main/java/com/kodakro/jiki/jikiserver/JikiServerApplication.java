@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringBootApplication(scanBasePackages = "com.kodakro.jiki")
-//(exclude = { SecurityAutoConfiguration.class })
 @EnableCaching
 public class JikiServerApplication {
 
