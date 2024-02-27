@@ -7,6 +7,11 @@ target/
 ### LOGS ###
 /logs/
 
+# System Files
+.DS_Store
+Thumbs.db
+.env
+
 ### STS ###
 .apt_generated
 .classpath
