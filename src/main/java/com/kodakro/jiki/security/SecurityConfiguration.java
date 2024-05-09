@@ -46,19 +46,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.cors().and()
-		.csrf().disable()
-		.authorizeRequests()
-		.antMatchers(REGISTER_URL).permitAll()
-		.antMatchers("/api/project/all").permitAll()
-		.antMatchers("/api/team/all").permitAll()
-		.antMatchers("/api/admin/").hasRole("ADMIN")
-		.antMatchers("/api/*").hasAnyRole("ADMIN", "USER")
-		.anyRequest().authenticated()
-		.and()
-		.addFilter(new JWTAuthenticationFilter(authenticationManager()))
-		.addFilter(new JWTAuthorizationFilter(authenticationManager()))
-		.exceptionHandling().accessDeniedHandler(accessDeniedHandler());
+        http.cors(cors -> cors.disable())
+                .csrf(csrf -> csrf.disable())
+                .authorizeRequests(requests -> requests
+                        .antMatchers(REGISTER_URL).permitAll()
+                        .antMatchers("/api/project/all").permitAll()
+                        .antMatchers("/api/team/all").permitAll()
+                        .antMatchers("/api/admin/").hasRole("ADMIN")
+                        .antMatchers("/api/*").hasAnyRole("ADMIN", "USER")
+                        .anyRequest().authenticated())
+                .addFilter(new JWTAuthenticationFilter(authenticationManager()))
+                .addFilter(new JWTAuthorizationFilter(authenticationManager()))
+                .exceptionHandling(handling -> handling.accessDeniedHandler(accessDeniedHandler()));
 	}
 	
 	@Bean
