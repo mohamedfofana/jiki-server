@@ -9,7 +9,7 @@ The version used is Spring Boot 2.5.6.
 * Using Spring Boot 2.5.6
 * Using Spring Boot Security
 * Using Spring Boot Data JPA
-* Using Hazelcas 4.1.5 for caching
+* Using Hazelcast 4.1.5 for caching
 * Using lombok 1.18.22
 * Using Jasypt to encrypt sensitive data
 * Using a Global ExceptionHandler with a @ControllerAdvice
